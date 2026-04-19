@@ -1,6 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
-import { registerRoutes } from "../server/routes";
+import { registerRoutes } from "../../server/routes";
 import { createServer } from "http";
 
 const app = express();

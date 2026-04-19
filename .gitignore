@@ -9,5 +9,5 @@ vite.config.ts.*
 .vercel
 .replit
 .local
-api/index.js
+api/*.js
 .env*.local

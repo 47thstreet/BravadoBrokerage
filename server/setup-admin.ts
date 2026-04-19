@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { Pool, neonConfig } from "@neondatabase/serverless";
-import { users } from "@shared/schema";
+import { users } from "../shared/schema";
 import { hashPassword, generateRandomPassword } from "./auth";
 import ws from "ws";
 

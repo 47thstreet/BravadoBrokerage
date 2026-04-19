@@ -1,7 +1,7 @@
 // Future API Integration Structure for Bravado Real Estate
 // This file will contain the API integrations for external real estate services
 
-import { Property, Agent } from "@shared/schema";
+import { Property, Agent } from "../shared/schema";
 
 /**
  * CBRE API Integration

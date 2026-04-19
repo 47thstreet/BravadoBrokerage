@@ -1,4 +1,4 @@
-import { type Property, type InsertProperty, type Agent, type InsertAgent, type Inquiry, type InsertInquiry, type MarketReport, type InsertMarketReport, type Subscription, type InsertSubscription, type User, type InsertUser, type PasswordSetupToken, type InsertPasswordSetupToken, properties, agents, inquiries, marketReports, subscriptions, users, passwordSetupTokens } from "@shared/schema";
+import { type Property, type InsertProperty, type Agent, type InsertAgent, type Inquiry, type InsertInquiry, type MarketReport, type InsertMarketReport, type Subscription, type InsertSubscription, type User, type InsertUser, type PasswordSetupToken, type InsertPasswordSetupToken, properties, agents, inquiries, marketReports, subscriptions, users, passwordSetupTokens } from "../shared/schema";
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 import { eq, and, gte, lte, sql, desc } from "drizzle-orm";

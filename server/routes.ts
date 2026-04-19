@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertPropertySchema, insertAgentSchema, insertInquirySchema, insertMarketReportSchema, insertSubscriptionSchema } from "@shared/schema";
+import { insertPropertySchema, insertAgentSchema, insertInquirySchema, insertMarketReportSchema, insertSubscriptionSchema } from "../shared/schema";
 import { z } from "zod";
 import { isAuthenticated, isAdmin, isAdminOrAgent, hashPassword, verifyPassword, generateSetupToken } from "./auth";
 

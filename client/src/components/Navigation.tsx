@@ -47,7 +47,7 @@ const Navigation = () => {
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center" onClick={scrollToTop} data-testid="logo-link">
-              <BRELogo size="md" />
+              <BRELogo height="h-14" />
             </Link>
             {/* Version Switcher — click to toggle */}
             <div className="relative">

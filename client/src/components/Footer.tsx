@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="grid lg:grid-cols-12 gap-12 mb-16">
           {/* Logo Section - Takes 4 columns, pushing content right */}
           <div className="lg:col-span-4 flex items-start">
-            <BRELogo size="lg" />
+            <BRELogo height="h-40" />
           </div>
           
           {/* Company Section */}

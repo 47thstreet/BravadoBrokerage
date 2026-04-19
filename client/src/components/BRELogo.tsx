@@ -2,24 +2,23 @@ import { cn } from "@/lib/utils";
 
 interface BRELogoProps {
   className?: string;
-  size?: "sm" | "md" | "lg";
+  height?: string;
 }
 
-const sizes = {
-  sm: "text-3xl",
-  md: "text-5xl",
-  lg: "text-7xl",
-};
-
-const BRELogo = ({ className, size = "md" }: BRELogoProps) => {
+const BRELogo = ({ className, height = "h-16" }: BRELogoProps) => {
   return (
-    <span
-      className={cn("font-display tracking-tight select-none inline-flex items-baseline leading-none", sizes[size], className)}
-      aria-label="Bravado Real Estate"
-    >
-      <span className="font-bold text-white">B</span>
-      <span className="font-light text-red-600 mx-[0.04em]">|</span>
-      <span className="font-extralight text-white">RE</span>
+    <span className={cn("relative inline-block", height, className)} aria-label="Bravado Real Estate">
+      {/* Base: inverted image (all white on dark bg) */}
+      <img
+        src="/attached_assets/smallo_1757979641363.png"
+        alt=""
+        className={cn("brightness-0 invert", height, "w-auto")}
+      />
+      {/* Red pipe overlay — positioned over the | in the original image */}
+      <span
+        className="absolute top-[7%] bg-red-600"
+        style={{ left: "35.5%", width: "2.4%", height: "74%" }}
+      />
     </span>
   );
 };

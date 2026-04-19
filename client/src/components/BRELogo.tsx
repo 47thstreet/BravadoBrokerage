@@ -15,7 +15,7 @@ const BRELogo = ({ className, height = "h-16", invertColors = true }: BRELogoPro
         src="/attached_assets/logo-b.png"
         alt=""
         className={cn(height, "w-auto", filter)}
-        style={{ marginRight: "-3%" }}
+        style={{ marginRight: "2%" }}
         draggable={false}
       />
       <img
@@ -28,7 +28,7 @@ const BRELogo = ({ className, height = "h-16", invertColors = true }: BRELogoPro
         src="/attached_assets/logo-re.png"
         alt=""
         className={cn(height, "w-auto", filter)}
-        style={{ marginLeft: "-3%" }}
+        style={{ marginLeft: "2%" }}
         draggable={false}
       />
     </span>

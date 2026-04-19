@@ -20,6 +20,32 @@ Bravado Real Estate is a boutique NYC brokerage that operates with institutional
 
 ---
 
+## 1b. Logo Construction
+
+The B|RE logo is composed of three discrete image assets extracted from the original master file:
+
+| Asset | File | Content | Inversion |
+|-------|------|---------|-----------|
+| B | `logo-b.png` | Solid black Bodoni B | Inverts to white on dark backgrounds |
+| Pipe | `logo-pipe.png` | Oxblood red vertical bar | NEVER inverts -- always red |
+| RE | `logo-re.png` | Outlined Bodoni R and E | Inverts to white on dark backgrounds |
+
+### Logo Rules
+- **Minimum size:** 40px height (h-10 in Tailwind). Below this the outlined RE becomes illegible.
+- **Clear space:** Maintain at least 0.5x the logo height as clear space on all sides.
+- **Dark backgrounds (default):** B and RE invert to white via `brightness-0 invert`. The red pipe stays red.
+- **Light backgrounds:** B and RE remain black. The red pipe stays red. Set `invertColors={false}` on the component.
+- **Never:** Place the logo on a red background. Never stretch, rotate, or separate the three parts beyond their natural spacing. Never add drop shadows or outlines.
+- **Favicon:** Simplified to just "B|" at 64x64 in SVG format (`/favicon.svg`).
+
+### Component Usage
+```tsx
+<BRELogo height="h-14" />                    // Default: white B|RE on dark bg
+<BRELogo height="h-14" invertColors={false} /> // Black B|RE on light bg
+```
+
+---
+
 ## 2. Brand Personality
 
 Five adjectives that define B|RE:

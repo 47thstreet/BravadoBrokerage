@@ -2,11 +2,6 @@
   "buildCommand": "npm run build:vercel",
   "outputDirectory": "dist/public",
   "framework": "vite",
-  "functions": {
-    "api/index.js": {
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/((?!assets|attached_assets|favicon).*)", "destination": "/index.html" }

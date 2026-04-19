@@ -40,23 +40,28 @@ const PIPE = "hsl(0, 100%, 45%)";
 
 /** Animated counter -- counts up on viewport entry, once only */
 function useCounter(end: number, duration = 2000) {
+  const safeEnd = Number.isFinite(end) && end > 0 ? end : 0;
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const started = useRef(false);
 
   useEffect(() => {
-    if (!inView || started.current) return;
+    if (!inView || started.current || safeEnd === 0) return;
     started.current = true;
     const t0 = performance.now();
     const tick = (now: number) => {
       const p = Math.min((now - t0) / duration, 1);
+      if (p >= 1) {
+        setCount(safeEnd);
+        return;
+      }
       const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
-      setCount(Math.floor(eased * end));
-      if (p < 1) requestAnimationFrame(tick);
+      setCount(Math.floor(eased * safeEnd));
+      requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  }, [inView, end, duration]);
+  }, [inView, safeEnd, duration]);
 
   return { count, ref };
 }
@@ -119,7 +124,7 @@ const TeamSection = ({ scrollToTop }: { scrollToTop: () => void }) => {
   const displayAgents = agents?.slice(0, 3) ?? [];
 
   return (
-    <section className="py-24 md:py-32" aria-label="Our team">
+    <section className="py-24 md:py-32" aria-label="Our team" data-testid="team-section">
       <div className="executive-container">
         <SectionHeader label="Our Team" />
 
@@ -143,7 +148,7 @@ const TeamSection = ({ scrollToTop }: { scrollToTop: () => void }) => {
                   variants={fadeUp}
                   viewport={{ once: true }}
                 >
-                  <Link href={`/agents/${agent.id}`} onClick={scrollToTop}>
+                  <Link href={`/agents/${agent.id}`} onClick={scrollToTop} aria-label={`View profile for ${agent.name}`}>
                     <div className="group relative bg-neutral-900 border border-neutral-800 p-8 hover:border-neutral-700 transition-all duration-300 cursor-pointer">
                       {/* Pipe accent -- grows on hover */}
                       <div
@@ -174,7 +179,7 @@ const TeamSection = ({ scrollToTop }: { scrollToTop: () => void }) => {
           transition={{ duration: 0.6, delay: 0.3 }}
           viewport={{ once: true }}
         >
-          <Link href="/agents" onClick={scrollToTop}>
+          <Link href="/agents" onClick={scrollToTop} aria-label="View all agents">
             <span className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition-colors uppercase tracking-wider font-body">
               View All Agents{" "}
               <span style={{ color: PIPE }}>|</span>{" "}
@@ -321,19 +326,23 @@ const HomeV8 = () => {
               custom={3}
               className="flex flex-wrap items-center gap-5 mb-16"
             >
-              <Link href="/listings/commercial" onClick={scrollToTop}>
-                <button
-                  className="group flex items-center gap-3 bg-white text-neutral-950 px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-neutral-200 transition-colors duration-200 font-body"
-                  data-testid="hero-cta-primary"
-                >
-                  View Properties
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                </button>
+              <Link
+                href="/listings/commercial"
+                onClick={scrollToTop}
+                className="group inline-flex items-center gap-3 bg-white text-neutral-950 px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-neutral-200 transition-colors duration-200 font-body"
+                data-testid="hero-cta-primary"
+                aria-label="View properties"
+              >
+                View Properties
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
               </Link>
-              <Link href="/contact" onClick={scrollToTop}>
-                <button className="flex items-center gap-3 text-neutral-400 hover:text-white text-sm uppercase tracking-wider transition-colors duration-200 font-body">
-                  <span style={{ color: PIPE }}>|</span> Contact Us
-                </button>
+              <Link
+                href="/contact"
+                onClick={scrollToTop}
+                className="inline-flex items-center gap-3 text-neutral-400 hover:text-white text-sm uppercase tracking-wider transition-colors duration-200 font-body"
+                aria-label="Contact us"
+              >
+                <span style={{ color: PIPE }}>|</span> Contact Us
               </Link>
             </motion.div>
 
@@ -343,8 +352,7 @@ const HomeV8 = () => {
               animate="visible"
               variants={fadeUp}
               custom={4}
-              className="flex items-center gap-0 divide-x max-w-lg"
-              style={{ divideColor: "rgba(255,255,255,0.12)" }}
+              className="flex items-center gap-0 divide-x divide-white/[0.12] max-w-lg"
             >
               {[
                 { value: "15+", label: "Years" },
@@ -395,6 +403,7 @@ const HomeV8 = () => {
         className="py-5 border-y"
         style={{ borderColor: "rgba(255,255,255,0.06)" }}
         aria-label="Social proof"
+        data-testid="social-proof"
       >
         <div className="executive-container">
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-neutral-500 font-body">
@@ -422,6 +431,7 @@ const HomeV8 = () => {
       <section
         className="py-24 md:py-32"
         aria-label="Featured properties"
+        data-testid="featured-properties"
       >
         <div className="executive-container">
           <div className="flex items-end justify-between mb-12">
@@ -449,7 +459,7 @@ const HomeV8 = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
             >
-              <Link href="/listings/commercial" onClick={scrollToTop}>
+              <Link href="/listings/commercial" onClick={scrollToTop} aria-label="View all properties">
                 <span className="hidden md:flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition-colors uppercase tracking-wider font-body">
                   View All{" "}
                   <span style={{ color: PIPE }}>|</span>{" "}
@@ -474,7 +484,7 @@ const HomeV8 = () => {
 
           {/* Mobile view-all link */}
           <div className="mt-8 text-center md:hidden">
-            <Link href="/listings/commercial" onClick={scrollToTop}>
+            <Link href="/listings/commercial" onClick={scrollToTop} aria-label="View all properties">
               <span className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition-colors uppercase tracking-wider font-body">
                 View All Properties{" "}
                 <ArrowRight className="w-4 h-4" />
@@ -492,6 +502,7 @@ const HomeV8 = () => {
         className="py-24 md:py-32 border-y"
         style={{ borderColor: "rgba(255,255,255,0.06)" }}
         aria-label="Why Bravado"
+        data-testid="value-proposition"
       >
         <div className="executive-container">
           <SectionHeader label="The Bravado Advantage" />
@@ -544,14 +555,11 @@ const HomeV8 = () => {
           5. DEAL HIGHLIGHTS -- Animated counters, pipe-divided
           Emotional target: TRUST + DESIRE
           ================================================================ */}
-      <section className="py-24 md:py-32" aria-label="Deal highlights">
+      <section className="py-24 md:py-32" aria-label="Deal highlights" data-testid="deal-highlights">
         <div className="executive-container">
           <SectionHeader label="Proof of Execution" />
 
-          <div
-            className="grid grid-cols-1 md:grid-cols-3 gap-0 md:divide-x"
-            style={{ divideColor: PIPE }}
-          >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
             {[
               {
                 ref: stat47m.ref,
@@ -586,7 +594,8 @@ const HomeV8 = () => {
             ].map((deal, i) => (
               <motion.div
                 key={deal.title}
-                className="py-8 md:py-0 md:px-12 first:md:pl-0 last:md:pr-0 border-b md:border-b-0 border-neutral-800 last:border-b-0"
+                className={`py-8 md:py-0 md:px-12 first:md:pl-0 last:md:pr-0 border-b md:border-b-0 border-neutral-800 last:border-b-0${i > 0 ? " md:border-l" : ""}`}
+                style={i > 0 ? { borderLeftColor: PIPE } : undefined}
                 initial="hidden"
                 whileInView="visible"
                 custom={i}
@@ -623,6 +632,7 @@ const HomeV8 = () => {
         className="py-24 md:py-32 border-y"
         style={{ borderColor: "rgba(255,255,255,0.06)" }}
         aria-label="Client testimonials"
+        data-testid="testimonials"
       >
         <div className="executive-container">
           <SectionHeader label="Client Voices" />
@@ -687,6 +697,7 @@ const HomeV8 = () => {
       <section
         className="py-32 md:py-40"
         aria-label="Brand statement"
+        data-testid="brand-statement"
       >
         <div className="executive-container text-center">
           <motion.h2
@@ -722,7 +733,7 @@ const HomeV8 = () => {
           9. NEIGHBORHOOD MARQUEE -- Continuous ticker, pipe separators
           Emotional target: UNDERSTANDING (scope of coverage)
           ================================================================ */}
-      <section className="py-12 overflow-hidden" aria-label="Neighborhoods served">
+      <section className="py-12 overflow-hidden" aria-label="Neighborhoods served" data-testid="neighborhood-marquee">
         <motion.div
           className="flex items-center gap-0 whitespace-nowrap"
           animate={{ x: ["0%", "-50%"] }}
@@ -767,7 +778,7 @@ const HomeV8 = () => {
           10. CTA -- Pipe-framed box. Animated corner accents. Direct.
           Emotional target: ACTION
           ================================================================ */}
-      <section className="py-24 md:py-32" aria-label="Call to action">
+      <section className="py-24 md:py-32" aria-label="Call to action" data-testid="cta-section">
         <div className="executive-container">
           <motion.div
             className="relative border p-12 md:p-20 text-center"
@@ -843,17 +854,23 @@ const HomeV8 = () => {
               institutional rigor and personal commitment to every engagement.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/listings/commercial" onClick={scrollToTop}>
-                <button className="group flex items-center gap-3 bg-white text-neutral-950 px-10 py-4 text-sm font-medium uppercase tracking-wider hover:bg-neutral-200 transition-colors duration-200 font-body">
-                  View Properties
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                </button>
+              <Link
+                href="/listings/commercial"
+                onClick={scrollToTop}
+                className="group inline-flex items-center gap-3 bg-white text-neutral-950 px-10 py-4 text-sm font-medium uppercase tracking-wider hover:bg-neutral-200 transition-colors duration-200 font-body"
+                aria-label="View properties"
+              >
+                View Properties
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
               </Link>
-              <Link href="/contact" onClick={scrollToTop}>
-                <button className="flex items-center gap-3 border border-neutral-700 hover:border-neutral-500 text-neutral-400 hover:text-white px-10 py-4 text-sm uppercase tracking-wider transition-all duration-200 font-body">
-                  <Phone className="w-4 h-4" />
-                  Contact Us
-                </button>
+              <Link
+                href="/contact"
+                onClick={scrollToTop}
+                className="inline-flex items-center gap-3 border border-neutral-700 hover:border-neutral-500 text-neutral-400 hover:text-white px-10 py-4 text-sm uppercase tracking-wider transition-all duration-200 font-body"
+                aria-label="Contact us"
+              >
+                <Phone className="w-4 h-4" />
+                Contact Us
               </Link>
             </div>
           </motion.div>

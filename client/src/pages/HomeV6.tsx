@@ -6,6 +6,7 @@ import {
   useInView,
   useMotionValue,
   useSpring,
+  AnimatePresence,
 } from "framer-motion";
 import { useRef, useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
@@ -30,9 +31,13 @@ import {
   Target,
   Zap,
   X,
-  CheckCircle,
 } from "lucide-react";
 import PropertyGrid from "@/components/PropertyGrid";
+
+// ---------------------------------------------------------------
+// SESSION STORAGE KEY FOR EXIT-INTENT
+// ---------------------------------------------------------------
+const EXIT_INTENT_KEY = "bravado_exit_intent_shown";
 
 // ---------------------------------------------------------------
 // ANIMATED COUNTER HOOK (V2 - requestAnimationFrame + easeOutCubic)
@@ -171,6 +176,22 @@ const TESTIMONIALS = [
 ];
 
 // ---------------------------------------------------------------
+// MARQUEE ITEMS
+// ---------------------------------------------------------------
+const MARQUEE_ITEMS = [
+  "Manhattan",
+  "Brooklyn",
+  "Queens",
+  "Bronx",
+  "Staten Island",
+  "Commercial",
+  "Residential",
+  "Investment",
+  "Development",
+  "Advisory",
+];
+
+// ---------------------------------------------------------------
 // MAIN COMPONENT
 // ---------------------------------------------------------------
 const HomeV6 = () => {
@@ -199,16 +220,21 @@ const HomeV6 = () => {
   // Magnetic CTA (V2)
   const magnetic = useMagneticHover(0.25);
 
-  // Exit-intent newsletter popup (V4)
+  // Exit-intent newsletter popup (V4) -- once per session via sessionStorage
   const [showNewsletter, setShowNewsletter] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
   const exitIntentFired = useRef(false);
 
   useEffect(() => {
+    // Check sessionStorage so it only fires once per browser session
+    if (sessionStorage.getItem(EXIT_INTENT_KEY) === "true") {
+      exitIntentFired.current = true;
+    }
     const handler = (e: MouseEvent) => {
       if (e.clientY < 10 && !exitIntentFired.current && !newsletterSubmitted) {
         exitIntentFired.current = true;
+        sessionStorage.setItem(EXIT_INTENT_KEY, "true");
         setShowNewsletter(true);
       }
     };
@@ -228,7 +254,7 @@ const HomeV6 = () => {
 
   return (
     <div
-      className="min-h-screen bg-neutral-950 overflow-x-hidden"
+      className="min-h-screen bg-neutral-950 overflow-x-hidden pb-20"
       data-testid="home-page"
     >
       {/* ================================================================
@@ -237,15 +263,19 @@ const HomeV6 = () => {
       <section
         ref={heroRef}
         className="relative h-screen min-h-[700px] overflow-hidden"
+        aria-label="Hero"
         data-testid="hero"
       >
         {/* Parallax background */}
         <motion.div
           className="absolute inset-0 z-0"
           style={{ y: heroY, scale: heroScale }}
+          aria-hidden="true"
         >
           <div
             className="absolute inset-0 bg-cover bg-center"
+            role="img"
+            aria-label="Aerial view of New York City skyline"
             style={{ backgroundImage: `url(${HERO_BG})` }}
           />
           <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/50 to-transparent" />
@@ -283,7 +313,7 @@ const HomeV6 = () => {
               className="mb-6"
             >
               <span className="inline-flex items-center gap-2 px-4 py-1.5 text-xs tracking-[0.3em] uppercase border border-white/30 text-white/80 backdrop-blur-sm font-body">
-                <Shield className="w-3.5 h-3.5" />
+                <Shield className="w-3.5 h-3.5" aria-hidden="true" />
                 NYC Licensed &mdash; Est. 2018
               </span>
             </motion.div>
@@ -314,7 +344,7 @@ const HomeV6 = () => {
                 </span>
               </motion.h1>
 
-              <motion.h2
+              <motion.p
                 className="text-display-md text-white/70 mt-2 md:mt-4 md:ml-[15%] font-display"
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -323,10 +353,11 @@ const HomeV6 = () => {
                   delay: 0.9,
                   ease: [0.22, 1, 0.36, 1],
                 }}
+                role="doc-subtitle"
               >
                 Strengthened by{" "}
                 <span className="text-white font-medium">Expertise.</span>
-              </motion.h2>
+              </motion.p>
             </div>
 
             {/* Subtext (V2 editorial) */}
@@ -357,7 +388,7 @@ const HomeV6 = () => {
                 ease: [0.22, 1, 0.36, 1],
               }}
             >
-              <Link href="/properties" onClick={scrollToTop}>
+              <Link href="/listings/commercial" onClick={scrollToTop}>
                 <motion.div
                   ref={magnetic.ref}
                   style={{ x: magnetic.springX, y: magnetic.springY }}
@@ -371,13 +402,14 @@ const HomeV6 = () => {
                   >
                     <span className="relative z-10 flex items-center gap-3">
                       Browse Properties
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" aria-hidden="true" />
                     </span>
                     <motion.div
                       className="absolute inset-0 bg-white/10"
                       initial={{ x: "-100%" }}
                       whileHover={{ x: "100%" }}
                       transition={{ duration: 0.5 }}
+                      aria-hidden="true"
                     />
                   </Button>
                 </motion.div>
@@ -389,7 +421,7 @@ const HomeV6 = () => {
                   size="lg"
                   className="text-white/80 hover:text-white hover:bg-white/10 px-8 py-6 text-sm tracking-[0.15em] uppercase rounded-none border border-white/20 font-body"
                 >
-                  <Phone className="w-4 h-4 mr-2" />
+                  <Phone className="w-4 h-4 mr-2" aria-hidden="true" />
                   (212) 555-1234
                 </Button>
               </a>
@@ -434,7 +466,7 @@ const HomeV6 = () => {
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             aria-label="Scroll to content"
           >
-            <ChevronDown className="w-6 h-6" />
+            <ChevronDown className="w-6 h-6" aria-hidden="true" />
           </motion.button>
         </motion.div>
       </section>
@@ -445,23 +477,24 @@ const HomeV6 = () => {
       <section
         id="social-proof-bar"
         className="py-5 bg-neutral-900 border-y border-white/[0.06]"
+        aria-label="Social proof"
       >
         <div className="executive-container">
           <div className="flex flex-wrap justify-center items-center gap-x-10 gap-y-3 text-white text-sm font-body">
             <div className="flex items-center gap-2">
-              <Award className="w-4 h-4 text-[hsl(0,100%,55%)]" />
+              <Award className="w-4 h-4 text-[hsl(0,100%,55%)]" aria-hidden="true" />
               <span>Top 1% NYC Brokerage</span>
             </div>
             <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-yellow-400" />
+              <Star className="w-4 h-4 text-yellow-400" aria-hidden="true" />
               <span>4.9/5 Client Rating</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-[hsl(0,100%,55%)]" />
+              <Clock className="w-4 h-4 text-[hsl(0,100%,55%)]" aria-hidden="true" />
               <span>Avg. 14 Days to Close</span>
             </div>
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-green-400" />
+              <TrendingUp className="w-4 h-4 text-green-400" aria-hidden="true" />
               <span>$73K Avg. Client Savings</span>
             </div>
           </div>
@@ -471,7 +504,7 @@ const HomeV6 = () => {
       {/* ================================================================
           3. EDITORIAL BRAND STORY SPLIT (V2)
           ================================================================ */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden" aria-label="Our approach">
         <div className="grid lg:grid-cols-2 min-h-[600px]">
           {/* Image side */}
           <RevealSection className="relative overflow-hidden">
@@ -484,6 +517,7 @@ const HomeV6 = () => {
                 src="/attached_assets/PHOTO-2019-02-04-15-25-38_1757990963195.jpg"
                 alt="Manhattan skyline at dusk"
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent lg:bg-gradient-to-l lg:from-transparent lg:to-black/20" />
             </motion.div>
@@ -497,7 +531,7 @@ const HomeV6 = () => {
               transition={{ duration: 0.6, delay: 0.4 }}
             >
               <div className="inline-block px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs tracking-[0.2em] uppercase font-body">
-                <MapPin className="w-3 h-3 inline mr-2" />
+                <MapPin className="w-3 h-3 inline mr-2" aria-hidden="true" />
                 Manhattan, NYC
               </div>
             </motion.div>
@@ -524,14 +558,14 @@ const HomeV6 = () => {
                 applied to New York's most complex real estate challenges.
               </p>
 
-              <div className="flex flex-col gap-4 mb-10">
+              <ul className="flex flex-col gap-4 mb-10 list-none p-0">
                 {[
                   "Advisory & brokerage for acquisitions and dispositions",
                   "Commercial leasing across all NYC boroughs",
                   "Development consulting and market analysis",
                   "Institutional-grade due diligence",
                 ].map((item, i) => (
-                  <motion.div
+                  <motion.li
                     key={item}
                     className="flex items-start gap-3 text-white/60 text-sm font-body"
                     initial={{ opacity: 0, x: -20 }}
@@ -539,11 +573,11 @@ const HomeV6 = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
                   >
-                    <div className="w-1.5 h-1.5 rounded-full bg-[hsl(0,100%,45%)] mt-1.5 flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[hsl(0,100%,45%)] mt-1.5 flex-shrink-0" aria-hidden="true" />
                     <span>{item}</span>
-                  </motion.div>
+                  </motion.li>
                 ))}
-              </div>
+              </ul>
 
               <Link href="/services" onClick={scrollToTop}>
                 <Button
@@ -551,7 +585,7 @@ const HomeV6 = () => {
                   className="text-white/70 hover:text-white hover:bg-white/5 px-0 text-sm tracking-[0.15em] uppercase rounded-none border-b border-white/20 hover:border-white/50 transition-all group font-body"
                 >
                   Our Services
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                 </Button>
               </Link>
             </RevealSection>
@@ -565,10 +599,12 @@ const HomeV6 = () => {
       <section
         id="featured-section"
         className="relative py-24 md:py-32 bg-neutral-950"
+        aria-label="Featured properties"
       >
         {/* Diagonal accent pattern (V2) */}
         <div
           className="absolute top-0 right-0 w-1/3 h-full opacity-[0.04]"
+          aria-hidden="true"
           style={{
             background:
               "repeating-linear-gradient(-45deg, hsl(0 100% 40%) 0, hsl(0 100% 40%) 1px, transparent 0, transparent 60px)",
@@ -592,7 +628,7 @@ const HomeV6 = () => {
               </h2>
             </RevealSection>
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4">
               {/* Urgency badge (V4) */}
               <motion.div
                 className="flex items-center gap-2 bg-red-950/40 text-red-400 text-sm font-medium px-4 py-2 border border-red-500/20"
@@ -601,17 +637,17 @@ const HomeV6 = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <Zap className="w-4 h-4" />
+                <Zap className="w-4 h-4" aria-hidden="true" />
                 <span>
                   Only <strong>7</strong> properties available this week
                 </span>
               </motion.div>
 
               <RevealSection delay={0.15}>
-                <Link href="/properties" onClick={scrollToTop}>
+                <Link href="/listings/commercial" onClick={scrollToTop}>
                   <span className="inline-flex items-center gap-2 text-sm tracking-[0.15em] uppercase text-white/50 hover:text-[hsl(0,100%,45%)] transition-colors group cursor-pointer font-body">
                     View All
-                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" aria-hidden="true" />
                   </span>
                 </Link>
               </RevealSection>
@@ -631,10 +667,11 @@ const HomeV6 = () => {
       {/* ================================================================
           5. WHY BRAVADO -- PAS BENEFIT CARDS (V4) + EDITORIAL TYPE (V2)
           ================================================================ */}
-      <section className="relative py-24 md:py-32 bg-neutral-900 overflow-hidden">
+      <section className="relative py-24 md:py-32 bg-neutral-900 overflow-hidden" aria-label="Why Bravado">
         {/* Background accent glow */}
         <div
           className="absolute inset-0 opacity-[0.06]"
+          aria-hidden="true"
           style={{
             background:
               "radial-gradient(ellipse at 30% 50%, hsl(0 100% 40%), transparent 70%)",
@@ -707,10 +744,10 @@ const HomeV6 = () => {
                 variants={staggerItem}
               >
                 {/* Animated top border on hover (V2 style) */}
-                <div className="absolute top-0 left-0 w-0 h-[2px] bg-[hsl(0,100%,45%)] group-hover:w-full transition-all duration-700" />
+                <div className="absolute top-0 left-0 w-0 h-[2px] bg-[hsl(0,100%,45%)] group-hover:w-full transition-all duration-700" aria-hidden="true" />
 
                 <div className="w-12 h-12 rounded-none border border-white/10 flex items-center justify-center mb-5 group-hover:border-[hsl(0,100%,45%,0.4)] transition-colors duration-500">
-                  <item.icon className="w-5 h-5 text-[hsl(0,100%,55%)]" />
+                  <item.icon className="w-5 h-5 text-[hsl(0,100%,55%)]" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg text-white mb-3 font-display">
                   {item.title}
@@ -729,11 +766,13 @@ const HomeV6 = () => {
           ================================================================ */}
       <section
         className="relative py-24 md:py-32 bg-neutral-950 overflow-hidden"
+        aria-label="Success metrics"
         data-testid="success-metrics"
       >
         {/* Accent line */}
         <div
           className="absolute top-0 left-0 w-full h-[1px]"
+          aria-hidden="true"
           style={{
             background:
               "linear-gradient(90deg, transparent, hsl(0 100% 40% / 0.5), transparent)",
@@ -741,7 +780,7 @@ const HomeV6 = () => {
         />
 
         {/* 45-degree background pattern */}
-        <div className="absolute inset-0 opacity-[0.03]">
+        <div className="absolute inset-0 opacity-[0.03]" aria-hidden="true">
           <div
             className="w-full h-full"
             style={{
@@ -815,6 +854,7 @@ const HomeV6 = () => {
                 <div
                   className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-3 font-display"
                   style={{ color: "hsl(0, 100%, 55%)" }}
+                  aria-label={`${stat.prefix ?? ""}${stat.value.toLocaleString()}${stat.suffix ?? ""} ${stat.label}`}
                 >
                   {stat.prefix}
                   {stat.value.toLocaleString()}
@@ -860,7 +900,7 @@ const HomeV6 = () => {
                 className="relative border border-white/[0.08] p-8 group hover:border-[hsl(0,100%,40%,0.3)] transition-all duration-500"
                 variants={staggerItem}
               >
-                <div className="absolute top-0 left-0 w-0 h-[2px] bg-[hsl(0,100%,45%)] group-hover:w-full transition-all duration-700" />
+                <div className="absolute top-0 left-0 w-0 h-[2px] bg-[hsl(0,100%,45%)] group-hover:w-full transition-all duration-700" aria-hidden="true" />
                 <div className="text-3xl md:text-4xl font-bold text-white mb-2 font-display">
                   {metric.value}
                 </div>
@@ -879,9 +919,10 @@ const HomeV6 = () => {
       {/* ================================================================
           7. TESTIMONIALS WITH STARS (V4) + EDITORIAL AESTHETIC (V2)
           ================================================================ */}
-      <section className="relative py-24 md:py-32 bg-neutral-950 overflow-hidden">
+      <section className="relative py-24 md:py-32 bg-neutral-950 overflow-hidden" aria-label="Client testimonials">
         <div
           className="absolute inset-0 opacity-[0.04]"
+          aria-hidden="true"
           style={{
             background:
               "radial-gradient(ellipse at 70% 30%, hsl(0 100% 40%), transparent 60%)",
@@ -922,25 +963,27 @@ const HomeV6 = () => {
                 variants={staggerItem}
               >
                 {/* Top accent line */}
-                <div className="absolute top-0 left-0 w-0 h-[2px] bg-[hsl(0,100%,45%)] group-hover:w-full transition-all duration-700" />
+                <div className="absolute top-0 left-0 w-0 h-[2px] bg-[hsl(0,100%,45%)] group-hover:w-full transition-all duration-700" aria-hidden="true" />
 
                 {/* Star rating */}
-                <div className="flex gap-1 mb-4">
+                <div className="flex gap-1 mb-4" aria-label={`${t.rating} out of 5 stars`}>
                   {Array.from({ length: t.rating }).map((_, i) => (
                     <Star
                       key={i}
                       className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                      aria-hidden="true"
                     />
                   ))}
                 </div>
 
-                <p className="text-white/70 leading-relaxed mb-6 italic font-body">
+                <blockquote className="text-white/70 leading-relaxed mb-6 italic font-body">
                   &ldquo;{t.text}&rdquo;
-                </p>
+                </blockquote>
 
                 <div className="flex items-center gap-3">
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold"
+                    aria-hidden="true"
                     style={{
                       background: "hsl(0 100% 45% / 0.15)",
                       color: "hsl(0, 100%, 60%)",
@@ -966,49 +1009,49 @@ const HomeV6 = () => {
       {/* ================================================================
           8. NEIGHBORHOOD MARQUEE TICKER (V2)
           ================================================================ */}
-      <section className="relative py-6 bg-neutral-900 overflow-hidden border-y border-white/[0.06]">
-        <motion.div
-          className="flex whitespace-nowrap gap-16"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-        >
-          {[...Array(2)].map((_, setIdx) => (
-            <div key={setIdx} className="flex gap-16 items-center">
-              {[
-                "Manhattan",
-                "Brooklyn",
-                "Queens",
-                "Bronx",
-                "Staten Island",
-                "Commercial",
-                "Residential",
-                "Investment",
-                "Development",
-                "Advisory",
-              ].map((text, i) => (
-                <span
-                  key={`${setIdx}-${i}`}
-                  className="text-sm tracking-[0.3em] uppercase text-neutral-600 flex items-center gap-4 font-body"
-                >
-                  {text}
+      <section
+        className="relative py-6 bg-neutral-900 overflow-hidden border-y border-white/[0.06]"
+        aria-label="Service areas"
+      >
+        <div className="overflow-hidden">
+          <motion.div
+            className="flex whitespace-nowrap gap-16"
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            aria-hidden="true"
+          >
+            {[0, 1].map((setIdx) => (
+              <div key={setIdx} className="flex gap-16 items-center shrink-0">
+                {MARQUEE_ITEMS.map((text) => (
                   <span
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ background: "hsl(0, 100%, 45%)" }}
-                  />
-                </span>
-              ))}
-            </div>
-          ))}
-        </motion.div>
+                    key={`${setIdx}-${text}`}
+                    className="text-sm tracking-[0.3em] uppercase text-neutral-600 flex items-center gap-4 font-body"
+                  >
+                    {text}
+                    <span
+                      className="w-1.5 h-1.5 rounded-full"
+                      style={{ background: "hsl(0, 100%, 45%)" }}
+                    />
+                  </span>
+                ))}
+              </div>
+            ))}
+          </motion.div>
+        </div>
+        {/* Screen-reader accessible list of areas */}
+        <div className="sr-only">
+          Service areas: {MARQUEE_ITEMS.join(", ")}
+        </div>
       </section>
 
       {/* ================================================================
           9. DUAL CTA SECTION (V4) + EDITORIAL DARK AESTHETIC (V2)
           ================================================================ */}
-      <section className="relative py-24 md:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-neutral-950" />
+      <section className="relative py-24 md:py-32 overflow-hidden" aria-label="Get started">
+        <div className="absolute inset-0 bg-neutral-950" aria-hidden="true" />
         <div
           className="absolute inset-0"
+          aria-hidden="true"
           style={{
             background:
               "radial-gradient(ellipse at 70% 50%, hsl(0 100% 40% / 0.1), transparent 60%)",
@@ -1016,6 +1059,7 @@ const HomeV6 = () => {
         />
         <div
           className="absolute inset-0"
+          aria-hidden="true"
           style={{
             background:
               "radial-gradient(ellipse at 20% 80%, hsl(352 60% 28% / 0.08), transparent 50%)",
@@ -1023,7 +1067,7 @@ const HomeV6 = () => {
         />
 
         {/* Grid lines */}
-        <div className="absolute inset-0 opacity-[0.03]">
+        <div className="absolute inset-0 opacity-[0.03]" aria-hidden="true">
           <div
             className="w-full h-full"
             style={{
@@ -1037,6 +1081,7 @@ const HomeV6 = () => {
         {/* Large watermark text */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20vw] font-bold text-white/[0.02] select-none pointer-events-none whitespace-nowrap font-display"
+          aria-hidden="true"
         >
           BRAVADO
         </div>
@@ -1074,12 +1119,12 @@ const HomeV6 = () => {
               className="relative border border-white/[0.08] p-10 text-center flex flex-col items-center group hover:border-[hsl(0,100%,40%,0.3)] transition-all duration-500 bg-neutral-900/30"
               variants={staggerItem}
             >
-              <div className="absolute top-0 left-0 w-0 h-[2px] bg-[hsl(0,100%,45%)] group-hover:w-full transition-all duration-700" />
+              <div className="absolute top-0 left-0 w-0 h-[2px] bg-[hsl(0,100%,45%)] group-hover:w-full transition-all duration-700" aria-hidden="true" />
               <div
                 className="w-16 h-16 flex items-center justify-center mb-6 border border-white/10"
                 style={{ background: "hsl(0 100% 45% / 0.1)" }}
               >
-                <Building className="w-8 h-8 text-[hsl(0,100%,55%)]" />
+                <Building className="w-8 h-8 text-[hsl(0,100%,55%)]" aria-hidden="true" />
               </div>
               <h3 className="text-xl text-white mb-3 font-display">
                 Browse Properties
@@ -1089,7 +1134,7 @@ const HomeV6 = () => {
                 five boroughs. Filter by price, neighborhood, and property type.
               </p>
               <Link
-                href="/properties"
+                href="/listings/commercial"
                 onClick={scrollToTop}
                 className="w-full"
               >
@@ -1098,7 +1143,7 @@ const HomeV6 = () => {
                   className="bg-[hsl(0,100%,45%)] hover:bg-[hsl(0,100%,38%)] text-white w-full py-6 text-sm tracking-[0.15em] uppercase rounded-none border-0 font-body"
                 >
                   Search Listings
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                  <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
                 </Button>
               </Link>
             </motion.div>
@@ -1108,12 +1153,12 @@ const HomeV6 = () => {
               className="relative border-2 border-[hsl(0,100%,45%,0.3)] p-10 text-center flex flex-col items-center group hover:border-[hsl(0,100%,45%,0.5)] transition-all duration-500 bg-neutral-900/30"
               variants={staggerItem}
             >
-              <div className="absolute top-0 left-0 w-0 h-[2px] bg-[hsl(0,100%,45%)] group-hover:w-full transition-all duration-700" />
+              <div className="absolute top-0 left-0 w-0 h-[2px] bg-[hsl(0,100%,45%)] group-hover:w-full transition-all duration-700" aria-hidden="true" />
               <div
                 className="w-16 h-16 flex items-center justify-center mb-6 border border-white/10"
                 style={{ background: "hsl(0 100% 45% / 0.1)" }}
               >
-                <Phone className="w-8 h-8 text-[hsl(0,100%,55%)]" />
+                <Phone className="w-8 h-8 text-[hsl(0,100%,55%)]" aria-hidden="true" />
               </div>
               <h3 className="text-xl text-white mb-3 font-display">
                 Talk to an Agent
@@ -1127,7 +1172,7 @@ const HomeV6 = () => {
                   size="lg"
                   className="bg-transparent border-2 border-[hsl(0,100%,45%)] text-[hsl(0,100%,55%)] hover:bg-[hsl(0,100%,45%)] hover:text-white w-full py-6 text-sm tracking-[0.15em] uppercase rounded-none font-body transition-all duration-300"
                 >
-                  <Phone className="mr-2 w-5 h-5" />
+                  <Phone className="mr-2 w-5 h-5" aria-hidden="true" />
                   Schedule Consultation
                 </Button>
               </a>
@@ -1139,18 +1184,21 @@ const HomeV6 = () => {
       {/* ================================================================
           10. STICKY BOTTOM BAR (V4)
           ================================================================ */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-neutral-950 border-t border-white/[0.08] shadow-[0_-4px_24px_rgba(0,0,0,0.4)] py-3 px-4">
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50 bg-neutral-950 border-t border-white/[0.08] shadow-[0_-4px_24px_rgba(0,0,0,0.4)] py-3 px-4"
+        aria-label="Quick contact"
+      >
         <div className="executive-container">
           <div className="flex items-center justify-between gap-4">
             <div className="hidden sm:flex items-center gap-3 text-sm text-white/50 font-body">
-              <Phone className="w-4 h-4 text-[hsl(0,100%,55%)]" />
+              <Phone className="w-4 h-4 text-[hsl(0,100%,55%)]" aria-hidden="true" />
               <a
                 href="tel:+12125551234"
                 className="font-semibold text-white hover:text-[hsl(0,100%,55%)] transition-colors"
               >
                 (212) 555-1234
               </a>
-              <span className="text-white/20">|</span>
+              <span className="text-white/20" aria-hidden="true">|</span>
               <span>Available 7 days a week</span>
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -1159,7 +1207,7 @@ const HomeV6 = () => {
                   variant="outline"
                   className="w-full border-[hsl(0,100%,45%)] text-[hsl(0,100%,55%)] bg-transparent rounded-none"
                 >
-                  <Phone className="mr-2 w-4 h-4" />
+                  <Phone className="mr-2 w-4 h-4" aria-hidden="true" />
                   Call Now
                 </Button>
               </a>
@@ -1170,75 +1218,92 @@ const HomeV6 = () => {
               >
                 <Button className="bg-[hsl(0,100%,45%)] hover:bg-[hsl(0,100%,38%)] text-white w-full sm:w-auto px-6 rounded-none text-sm tracking-[0.1em] uppercase font-body">
                   Schedule Consultation
-                  <ChevronRight className="ml-1 w-4 h-4" />
+                  <ChevronRight className="ml-1 w-4 h-4" aria-hidden="true" />
                 </Button>
               </Link>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Spacer so sticky bar does not cover content */}
-      <div className="h-16" />
+      </nav>
 
       {/* ================================================================
           EXIT-INTENT NEWSLETTER POPUP (V4)
           ================================================================ */}
-      {showNewsletter && !newsletterSubmitted && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
-          <motion.div
-            className="bg-neutral-900 border border-white/10 shadow-2xl max-w-md w-full p-8 relative"
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      <AnimatePresence>
+        {showNewsletter && !newsletterSubmitted && (
+          <div
+            className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="newsletter-dialog-title"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setShowNewsletter(false);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setShowNewsletter(false);
+            }}
           >
-            <button
-              onClick={() => setShowNewsletter(false)}
-              className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
-              aria-label="Close popup"
+            <motion.div
+              className="bg-neutral-900 border border-white/10 shadow-2xl max-w-md w-full p-8 relative"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
             >
-              <X className="w-5 h-5" />
-            </button>
-            <div className="text-center mb-6">
-              <div
-                className="w-14 h-14 flex items-center justify-center mx-auto mb-4 border border-white/10"
-                style={{ background: "hsl(0 100% 45% / 0.15)" }}
+              <button
+                onClick={() => setShowNewsletter(false)}
+                className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
+                aria-label="Close newsletter popup"
               >
-                <Mail className="w-7 h-7 text-[hsl(0,100%,55%)]" />
+                <X className="w-5 h-5" aria-hidden="true" />
+              </button>
+              <div className="text-center mb-6">
+                <div
+                  className="w-14 h-14 flex items-center justify-center mx-auto mb-4 border border-white/10"
+                  style={{ background: "hsl(0 100% 45% / 0.15)" }}
+                >
+                  <Mail className="w-7 h-7 text-[hsl(0,100%,55%)]" aria-hidden="true" />
+                </div>
+                <h3 id="newsletter-dialog-title" className="text-xl text-white mb-2 font-display">
+                  Wait -- Before You Go
+                </h3>
+                <p className="text-sm text-white/50 font-body">
+                  Get our free weekly NYC market report with pre-market listings
+                  and price alerts that have saved readers an average of $73K.
+                </p>
               </div>
-              <h3 className="text-xl text-white mb-2 font-display">
-                Wait -- Before You Go
-              </h3>
-              <p className="text-sm text-white/50 font-body">
-                Get our free weekly NYC market report with pre-market listings
-                and price alerts that have saved readers an average of $73K.
-              </p>
-            </div>
-            <form
-              onSubmit={handleNewsletterSubmit}
-              className="flex flex-col gap-3"
-            >
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                required
-                value={newsletterEmail}
-                onChange={(e) => setNewsletterEmail(e.target.value)}
-                className="h-12 bg-neutral-800 border-white/10 text-white placeholder:text-white/30 rounded-none"
-              />
-              <Button
-                type="submit"
-                className="bg-[hsl(0,100%,45%)] hover:bg-[hsl(0,100%,38%)] text-white w-full py-6 text-sm tracking-[0.1em] uppercase rounded-none font-body"
+              <form
+                onSubmit={handleNewsletterSubmit}
+                className="flex flex-col gap-3"
+                aria-label="Newsletter signup"
               >
-                Get Free Market Report
-              </Button>
-            </form>
-            <p className="text-white/30 text-xs text-center mt-3 font-body">
-              Join 2,000+ subscribers. No spam, ever.
-            </p>
-          </motion.div>
-        </div>
-      )}
+                <label htmlFor="newsletter-email" className="sr-only">
+                  Email address
+                </label>
+                <Input
+                  id="newsletter-email"
+                  type="email"
+                  placeholder="Enter your email"
+                  required
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  className="h-12 bg-neutral-800 border-white/10 text-white placeholder:text-white/30 rounded-none"
+                  autoFocus
+                />
+                <Button
+                  type="submit"
+                  className="bg-[hsl(0,100%,45%)] hover:bg-[hsl(0,100%,38%)] text-white w-full py-6 text-sm tracking-[0.1em] uppercase rounded-none font-body"
+                >
+                  Get Free Market Report
+                </Button>
+              </form>
+              <p className="text-white/30 text-xs text-center mt-3 font-body">
+                Join 2,000+ subscribers. No spam, ever.
+              </p>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

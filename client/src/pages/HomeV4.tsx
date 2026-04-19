@@ -1,20 +1,16 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "wouter";
-import { motion, useInView } from "framer-motion";
+import { useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Building,
-  Home as HomeIcon,
   TrendingUp,
   ArrowRight,
   CheckCircle,
-  DollarSign,
   BarChart3,
   Star,
   Target,
   Clock,
-  MapPin,
   Award,
   Users,
   Phone,
@@ -24,6 +20,7 @@ import {
   ChevronRight,
   X,
   Mail,
+  Building,
 } from "lucide-react";
 import PropertyGrid from "@/components/PropertyGrid";
 
@@ -114,17 +111,31 @@ const HomeV4 = () => {
   const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
   const exitIntentFired = useRef(false);
 
-  // Exit-intent trigger (desktop only)
+  // Exit-intent trigger (desktop only) — fires at most once per session
   useEffect(() => {
+    if (sessionStorage.getItem("bravado_exit_intent_shown")) {
+      exitIntentFired.current = true;
+    }
     const handler = (e: MouseEvent) => {
       if (e.clientY < 10 && !exitIntentFired.current && !newsletterSubmitted) {
         exitIntentFired.current = true;
+        sessionStorage.setItem("bravado_exit_intent_shown", "1");
         setShowNewsletter(true);
       }
     };
     document.addEventListener("mouseleave", handler);
     return () => document.removeEventListener("mouseleave", handler);
   }, [newsletterSubmitted]);
+
+  // Close popup on Escape key
+  useEffect(() => {
+    if (!showNewsletter) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowNewsletter(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [showNewsletter]);
 
   const handleNewsletterSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -138,7 +149,7 @@ const HomeV4 = () => {
 
   return (
     <div
-      className="min-h-screen bg-white dark:bg-neutral-950"
+      className="min-h-screen bg-white dark:bg-neutral-950 pb-16"
       data-testid="home-page"
     >
       {/* ================================================================= */}
@@ -551,7 +562,7 @@ const HomeV4 = () => {
       {/* ================================================================= */}
       {/* NEWSLETTER / EMAIL CAPTURE                                       */}
       {/* ================================================================= */}
-      <section className="py-16 bg-accent dark:bg-accent">
+      <section className="py-16 bg-accent dark:bg-accent" aria-label="Newsletter signup">
         <div className="executive-container">
           <div className="max-w-2xl mx-auto text-center text-white">
             <Mail className="w-10 h-10 mx-auto mb-4 opacity-80" />
@@ -577,6 +588,7 @@ const HomeV4 = () => {
                   type="email"
                   placeholder="Enter your email"
                   required
+                  aria-label="Email address for newsletter"
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   className="bg-white/10 border-white/20 text-white placeholder:text-white/50 flex-1 h-12"
@@ -600,7 +612,10 @@ const HomeV4 = () => {
       {/* ================================================================= */}
       {/* STICKY BOTTOM BAR — Phone + Schedule CTA                          */}
       {/* ================================================================= */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-neutral-950 border-t border-neutral-200 dark:border-neutral-800 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] py-3 px-4">
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-neutral-950 border-t border-neutral-200 dark:border-neutral-800 shadow-[0_-4px_24px_rgba(0,0,0,0.08)] py-3 px-4"
+        aria-label="Contact actions"
+      >
         <div className="executive-container">
           <div className="flex items-center justify-between gap-4">
             <div className="hidden sm:flex items-center gap-3 text-sm text-neutral-600 dark:text-neutral-400">
@@ -633,16 +648,20 @@ const HomeV4 = () => {
             </div>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Spacer so sticky bar doesn't cover content */}
-      <div className="h-16" />
+      {/* pb-16 on the outer wrapper prevents sticky bar from covering content */}
 
       {/* ================================================================= */}
       {/* EXIT-INTENT NEWSLETTER POPUP                                      */}
       {/* ================================================================= */}
       {showNewsletter && !newsletterSubmitted && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="exit-intent-title"
+        >
           <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-2xl max-w-md w-full p-8 relative">
             <button
               onClick={() => setShowNewsletter(false)}
@@ -655,7 +674,10 @@ const HomeV4 = () => {
               <div className="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-7 h-7 text-accent" />
               </div>
-              <h3 className="text-xl font-display font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+              <h3
+                id="exit-intent-title"
+                className="text-xl font-display font-semibold text-neutral-900 dark:text-neutral-100 mb-2"
+              >
                 Wait — Before You Go
               </h3>
               <p className="text-sm text-neutral-600 dark:text-neutral-400">
@@ -671,6 +693,7 @@ const HomeV4 = () => {
                 type="email"
                 placeholder="Enter your email"
                 required
+                aria-label="Email address for market report"
                 value={newsletterEmail}
                 onChange={(e) => setNewsletterEmail(e.target.value)}
                 className="h-12"

@@ -31,7 +31,6 @@ import {
   Target,
   Zap,
   X,
-  CheckCircle,
 } from "lucide-react";
 import PropertyGrid from "@/components/PropertyGrid";
 
@@ -40,6 +39,7 @@ import PropertyGrid from "@/components/PropertyGrid";
 // ---------------------------------------------------------------
 const PIPE_RED = "hsl(0, 100%, 45%)";
 const PIPE_RED_LIGHT = "hsl(0, 100%, 65%)";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PIPE_RED_HOVER = "hsl(0, 100%, 38%)";
 
 // ---------------------------------------------------------------
@@ -101,24 +101,32 @@ const CornerPipes = ({ className = "" }: { className?: string }) => (
 // ANIMATED COUNTER HOOK
 // ---------------------------------------------------------------
 function useAnimatedCounter(target: number, duration = 2000) {
+  const safeTarget = Number.isFinite(target) && target > 0 ? target : 0;
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
   const hasStarted = useRef(false);
 
   useEffect(() => {
-    if (!inView || hasStarted.current) return;
+    if (!inView || hasStarted.current || safeTarget === 0) return;
     hasStarted.current = true;
     const startTime = performance.now();
+    let rafId: number;
     const tick = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
+      if (progress >= 1) {
+        setCount(safeTarget);
+        return;
+      }
       const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(eased * target));
-      if (progress < 1) requestAnimationFrame(tick);
+      const result = Math.floor(eased * safeTarget);
+      setCount(Number.isFinite(result) ? result : 0);
+      rafId = requestAnimationFrame(tick);
     };
-    requestAnimationFrame(tick);
-  }, [inView, target, duration]);
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [inView, safeTarget, duration]);
 
   return { count, ref };
 }
@@ -343,12 +351,20 @@ const HomeV9 = () => {
   const magneticSecondary = useMagneticHover(0.15);
 
   // Exit-intent newsletter popup (Skill 1 - conversion)
+  // Only fires once per session via sessionStorage
   const [showNewsletter, setShowNewsletter] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState("");
-  const [newsletterSubmitted, setNewsletterSubmitted] = useState(false);
+  const [newsletterSubmitted, setNewsletterSubmitted] = useState(() => {
+    try { return sessionStorage.getItem("bravado_newsletter_dismissed") === "true"; } catch { return false; }
+  });
   const exitIntentFired = useRef(false);
 
   useEffect(() => {
+    const alreadyDismissed = (() => {
+      try { return sessionStorage.getItem("bravado_newsletter_dismissed") === "true"; } catch { return false; }
+    })();
+    if (alreadyDismissed) return;
+
     const handler = (e: MouseEvent) => {
       if (e.clientY < 10 && !exitIntentFired.current && !newsletterSubmitted) {
         exitIntentFired.current = true;
@@ -359,14 +375,19 @@ const HomeV9 = () => {
     return () => document.removeEventListener("mouseleave", handler);
   }, [newsletterSubmitted]);
 
+  const dismissNewsletter = useCallback(() => {
+    setShowNewsletter(false);
+    try { sessionStorage.setItem("bravado_newsletter_dismissed", "true"); } catch { /* noop */ }
+  }, []);
+
   const handleNewsletterSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
       if (!newsletterEmail) return;
       setNewsletterSubmitted(true);
-      setShowNewsletter(false);
+      dismissNewsletter();
     },
-    [newsletterEmail],
+    [newsletterEmail, dismissNewsletter],
   );
 
   return (
@@ -407,7 +428,7 @@ const HomeV9 = () => {
           />
           {/* Noise texture (Skill 3 - rich backgrounds) */}
           <div
-            className="absolute inset-0 opacity-[0.05] mix-blend-overlay"
+            className="absolute inset-0 opacity-[0.05] mix-blend-overlay pointer-events-none"
             style={{ backgroundImage: NOISE_SVG }}
           />
         </motion.div>
@@ -582,6 +603,7 @@ const HomeV9 = () => {
         id="social-proof-bar"
         className="py-5 bg-neutral-900 border-y border-white/[0.06]"
         aria-label="Social proof indicators"
+        data-testid="social-proof"
       >
         <div className="executive-container">
           <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 text-white text-sm font-body">
@@ -610,7 +632,7 @@ const HomeV9 = () => {
           Skill 3: Asymmetric layout, image zoom on hover, overlap
           Skill 4: Pipe as list item markers
           ================================================================ */}
-      <section className="relative overflow-hidden" aria-label="Our approach">
+      <section className="relative overflow-hidden" aria-label="Our approach" data-testid="our-approach">
         <div className="grid lg:grid-cols-2 min-h-[600px]">
           {/* Image side with overlap element (Skill 3 - asymmetry) */}
           <RevealSection className="relative overflow-hidden">
@@ -729,6 +751,7 @@ const HomeV9 = () => {
         id="featured-section"
         className="relative py-24 md:py-32 bg-neutral-950"
         aria-label="Featured properties"
+        data-testid="featured-properties"
       >
         {/* Diagonal accent pattern (Skill 3 - rich background) */}
         <div
@@ -773,7 +796,7 @@ const HomeV9 = () => {
               </motion.div>
 
               <RevealSection delay={0.15}>
-                <Link href="/properties" onClick={scrollToTop}>
+                <Link href="/properties" onClick={scrollToTop} aria-label="View all properties">
                   <span className="inline-flex items-center gap-2 text-sm tracking-[0.15em] uppercase text-white/50 hover:text-[hsl(0,100%,45%)] transition-colors group cursor-pointer font-body">
                     View All
                     <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -803,6 +826,7 @@ const HomeV9 = () => {
       <section
         className="relative py-24 md:py-32 bg-neutral-900 overflow-hidden"
         aria-label="Why choose Bravado"
+        data-testid="why-bravado"
       >
         {/* Background accent glow (Skill 3 - depth) */}
         <div
@@ -813,7 +837,7 @@ const HomeV9 = () => {
         />
         {/* Noise grain overlay (Skill 3) */}
         <div
-          className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
+          className="absolute inset-0 opacity-[0.03] mix-blend-overlay pointer-events-none"
           style={{ backgroundImage: NOISE_SVG }}
         />
 
@@ -889,6 +913,7 @@ const HomeV9 = () => {
       <section
         className="relative py-32 md:py-48 bg-neutral-950 overflow-hidden"
         aria-label="Brand statement"
+        data-testid="brand-statement"
       >
         {/* Deep background glow */}
         <div
@@ -955,8 +980,8 @@ const HomeV9 = () => {
           ================================================================ */}
       <section
         className="relative py-24 md:py-32 bg-neutral-950 overflow-hidden"
-        data-testid="success-metrics"
         aria-label="Track record and success metrics"
+        data-testid="success-metrics"
       >
         {/* Top accent line */}
         <div
@@ -1106,6 +1131,7 @@ const HomeV9 = () => {
       <section
         className="relative py-24 md:py-32 bg-neutral-950 overflow-hidden"
         aria-label="Client testimonials"
+        data-testid="testimonials"
       >
         <div
           className="absolute inset-0 opacity-[0.04]"
@@ -1207,6 +1233,7 @@ const HomeV9 = () => {
       <section
         className="relative py-6 bg-neutral-900 overflow-hidden border-y border-white/[0.06]"
         aria-label="Areas we serve"
+        data-testid="neighborhood-marquee"
       >
         <motion.div
           className="flex whitespace-nowrap gap-12"
@@ -1254,6 +1281,7 @@ const HomeV9 = () => {
       <section
         className="relative py-24 md:py-32 overflow-hidden"
         aria-label="Take the next step"
+        data-testid="cta-section"
       >
         <div className="absolute inset-0 bg-neutral-950" />
         <div
@@ -1462,7 +1490,7 @@ const HomeV9 = () => {
               <CornerPipes />
 
               <button
-                onClick={() => setShowNewsletter(false)}
+                onClick={dismissNewsletter}
                 className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 rounded p-1"
                 aria-label="Close popup"
               >

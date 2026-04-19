@@ -1,11 +1,11 @@
 import { Link } from "wouter";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { ArrowRight, Phone, ChevronDown } from "lucide-react";
 import PropertyGrid from "@/components/PropertyGrid";
 
 /**
- * HomeV6 — "The $100K Agency Build"
+ * HomeV7 — Premium brokerage homepage
  *
  * Merges the best of V2 (cinematic, editorial, parallax),
  * V4 (conversion psychology, trust signals, PAS copy),
@@ -19,30 +19,39 @@ import PropertyGrid from "@/components/PropertyGrid";
 const PIPE = "hsl(0, 100%, 45%)";
 
 // ---------------------------------------------------------------------------
-// Animated counter hook
+// Animated counter hook — guards against NaN / zero-division edge cases
 // ---------------------------------------------------------------------------
 function useCounter(end: number, duration = 2000) {
   const [count, setCount] = useState(0);
+  const [started, setStarted] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
 
   useEffect(() => {
     if (!inView) return;
-    let start = 0;
-    const step = end / (duration / 16);
+    if (end <= 0 || duration <= 0) {
+      setCount(end);
+      setStarted(true);
+      return;
+    }
+
+    setStarted(true);
+    let current = 0;
+    const totalFrames = Math.max(1, Math.floor(duration / 16));
+    const step = end / totalFrames;
     const timer = setInterval(() => {
-      start += step;
-      if (start >= end) {
+      current += step;
+      if (current >= end) {
         setCount(end);
         clearInterval(timer);
       } else {
-        setCount(Math.floor(start));
+        setCount(Math.floor(current));
       }
     }, 16);
     return () => clearInterval(timer);
   }, [inView, end, duration]);
 
-  return { count, ref };
+  return { count, ref, started };
 }
 
 // ---------------------------------------------------------------------------
@@ -58,6 +67,7 @@ const Pipe = ({
   <div
     className={`w-[3px] rounded-full ${height} ${className}`}
     style={{ background: PIPE }}
+    aria-hidden="true"
   />
 );
 
@@ -78,6 +88,22 @@ const fadeUp = {
 };
 
 // ---------------------------------------------------------------------------
+// Neighborhood list (extracted to avoid re-creation on each render)
+// ---------------------------------------------------------------------------
+const NEIGHBORHOODS = [
+  "Tribeca",
+  "SoHo",
+  "Chelsea",
+  "Midtown",
+  "Hudson Yards",
+  "Upper West Side",
+  "Financial District",
+  "Brooklyn Heights",
+  "Williamsburg",
+  "Greenwich Village",
+] as const;
+
+// ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 const HomeV7 = () => {
@@ -95,12 +121,12 @@ const HomeV7 = () => {
   const stat150k = useCounter(150, 2200);
   const stat94 = useCounter(94, 1800);
 
-  const scrollToTop = () => window.scrollTo(0, 0);
-  const scrollToContent = () => {
+  const scrollToTop = useCallback(() => window.scrollTo(0, 0), []);
+  const scrollToContent = useCallback(() => {
     document
       .getElementById("social-proof")
       ?.scrollIntoView({ behavior: "smooth" });
-  };
+  }, []);
 
   return (
     <div
@@ -113,6 +139,7 @@ const HomeV7 = () => {
       <section
         ref={heroRef}
         className="relative h-screen min-h-[700px] overflow-hidden"
+        aria-label="Hero"
         data-testid="hero"
       >
         {/* Parallax background image */}
@@ -122,6 +149,8 @@ const HomeV7 = () => {
         >
           <div
             className="absolute inset-0 bg-cover bg-center"
+            role="img"
+            aria-label="New York City skyline"
             style={{
               backgroundImage:
                 "url(/attached_assets/PHOTO-2019-02-04-15-25-38_1757990963195.jpg)",
@@ -131,7 +160,8 @@ const HomeV7 = () => {
           <div
             className="absolute inset-0"
             style={{
-              background: `linear-gradient(180deg, transparent 0%, hsla(0,0%,4%,0.6) 70%, hsl(0,0%,4%) 100%)`,
+              background:
+                "linear-gradient(180deg, transparent 0%, hsla(0,0%,4%,0.6) 70%, hsl(0,0%,4%) 100%)",
             }}
           />
         </motion.div>
@@ -139,8 +169,10 @@ const HomeV7 = () => {
         {/* Noise texture */}
         <div
           className="absolute inset-0 z-[1] pointer-events-none opacity-[0.03] mix-blend-overlay"
+          aria-hidden="true"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
           }}
         />
 
@@ -177,6 +209,7 @@ const HomeV7 = () => {
               <span
                 className="inline-block mx-2 md:mx-3 text-[0.5em] font-light"
                 style={{ color: PIPE }}
+                aria-hidden="true"
               >
                 |
               </span>
@@ -205,16 +238,20 @@ const HomeV7 = () => {
               custom={3}
               className="flex flex-wrap items-center gap-5 mb-16"
             >
-              <Link href="/listings/commercial" onClick={scrollToTop}>
-                <button className="group flex items-center gap-3 bg-white text-neutral-950 px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-neutral-200 transition-colors duration-200">
-                  View Properties
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                </button>
+              <Link
+                href="/listings/commercial"
+                onClick={scrollToTop}
+                className="group inline-flex items-center gap-3 bg-white text-neutral-950 px-8 py-4 text-sm font-medium uppercase tracking-wider hover:bg-neutral-200 transition-colors duration-200"
+              >
+                View Properties
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
               </Link>
-              <Link href="/contact" onClick={scrollToTop}>
-                <button className="flex items-center gap-3 text-neutral-400 hover:text-white text-sm uppercase tracking-wider transition-colors duration-200">
-                  <span style={{ color: PIPE }}>|</span> Contact Us
-                </button>
+              <Link
+                href="/contact"
+                onClick={scrollToTop}
+                className="inline-flex items-center gap-3 text-neutral-400 hover:text-white text-sm uppercase tracking-wider transition-colors duration-200"
+              >
+                <span style={{ color: PIPE }} aria-hidden="true">|</span> Contact Us
               </Link>
             </motion.div>
 
@@ -224,15 +261,20 @@ const HomeV7 = () => {
               animate="visible"
               variants={fadeUp}
               custom={4}
-              className="flex items-center gap-0 divide-x max-w-lg"
-              style={{ divideColor: "rgba(255,255,255,0.12)" }}
+              className="flex items-center gap-0 divide-x divide-white/[0.12] max-w-lg"
+              role="list"
+              aria-label="Key statistics"
             >
               {[
                 { value: "15+", label: "Years" },
                 { value: "$140M+", label: "Volume" },
                 { value: "2,000+", label: "Deals" },
               ].map((stat) => (
-                <div key={stat.label} className="flex-1 text-center px-4 first:pl-0 last:pr-0">
+                <div
+                  key={stat.label}
+                  className="flex-1 text-center px-4 first:pl-0 last:pr-0"
+                  role="listitem"
+                >
                   <div className="font-display text-2xl md:text-3xl text-white tracking-tight">
                     {stat.value}
                   </div>
@@ -249,13 +291,18 @@ const HomeV7 = () => {
             onClick={scrollToContent}
             className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-neutral-600 hover:text-neutral-400 transition-colors cursor-pointer"
             animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
             aria-label="Scroll to content"
+            type="button"
           >
             <span className="text-[10px] uppercase tracking-[0.3em]">
               Scroll
             </span>
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="w-4 h-4" aria-hidden="true" />
           </motion.button>
         </motion.div>
       </section>
@@ -267,6 +314,7 @@ const HomeV7 = () => {
         id="social-proof"
         className="py-5 border-y"
         style={{ borderColor: "rgba(255,255,255,0.06)" }}
+        aria-label="Social proof"
       >
         <div className="executive-container">
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-neutral-500">
@@ -274,11 +322,11 @@ const HomeV7 = () => {
               Trusted by{" "}
               <strong className="text-neutral-300">2,000+</strong> NYC clients
             </span>
-            <span style={{ color: PIPE }}>|</span>
+            <span style={{ color: PIPE }} aria-hidden="true">|</span>
             <span>
               <strong className="text-neutral-300">4.9/5</strong> client rating
             </span>
-            <span style={{ color: PIPE }}>|</span>
+            <span style={{ color: PIPE }} aria-hidden="true">|</span>
             <span>
               Avg.{" "}
               <strong className="text-neutral-300">$73K</strong> client savings
@@ -290,7 +338,7 @@ const HomeV7 = () => {
       {/* ================================================================
           3. FEATURED PROPERTIES
           ================================================================ */}
-      <section className="py-24 md:py-32">
+      <section className="py-24 md:py-32" aria-label="Featured properties">
         <div className="executive-container">
           <div className="flex items-end justify-between mb-12">
             <motion.div
@@ -317,12 +365,14 @@ const HomeV7 = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
             >
-              <Link href="/listings/commercial" onClick={scrollToTop}>
-                <span className="hidden md:flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition-colors uppercase tracking-wider font-body">
-                  View All{" "}
-                  <span style={{ color: PIPE }}>|</span>{" "}
-                  <ArrowRight className="w-4 h-4" />
-                </span>
+              <Link
+                href="/listings/commercial"
+                onClick={scrollToTop}
+                className="hidden md:inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition-colors uppercase tracking-wider font-body"
+              >
+                View All{" "}
+                <span style={{ color: PIPE }} aria-hidden="true">|</span>{" "}
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Link>
             </motion.div>
           </div>
@@ -342,11 +392,13 @@ const HomeV7 = () => {
 
           {/* Mobile view-all link */}
           <div className="mt-8 text-center md:hidden">
-            <Link href="/listings/commercial" onClick={scrollToTop}>
-              <span className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition-colors uppercase tracking-wider font-body">
-                View All Properties{" "}
-                <ArrowRight className="w-4 h-4" />
-              </span>
+            <Link
+              href="/listings/commercial"
+              onClick={scrollToTop}
+              className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-white transition-colors uppercase tracking-wider font-body"
+            >
+              View All Properties{" "}
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -358,6 +410,7 @@ const HomeV7 = () => {
       <section
         className="py-24 md:py-32 border-y"
         style={{ borderColor: "rgba(255,255,255,0.06)" }}
+        aria-label="The Bravado advantage"
       >
         <div className="executive-container">
           <motion.div
@@ -399,6 +452,7 @@ const HomeV7 = () => {
                 {/* Pipe left border */}
                 <div
                   className="absolute left-0 top-0 bottom-0 w-[2px]"
+                  aria-hidden="true"
                   style={{
                     background: `linear-gradient(to bottom, ${PIPE}, transparent)`,
                   }}
@@ -418,7 +472,7 @@ const HomeV7 = () => {
       {/* ================================================================
           5. DEAL HIGHLIGHTS — Animated counters, pipe-divided
           ================================================================ */}
-      <section className="py-24 md:py-32">
+      <section className="py-24 md:py-32" aria-label="Deal highlights">
         <div className="executive-container">
           <motion.div
             className="flex items-center gap-4 mb-16"
@@ -432,36 +486,39 @@ const HomeV7 = () => {
             </span>
           </motion.div>
 
-          <div
-            className="grid grid-cols-1 md:grid-cols-3 gap-0 md:divide-x"
-            style={{ divideColor: PIPE }}
-          >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-0 md:divide-x md:divide-[hsl(0,100%,45%)]">
             {[
               {
                 ref: stat47m.ref,
                 count: stat47m.count,
+                started: stat47m.started,
                 prefix: "$",
                 suffix: "M",
                 title: "Midtown Investment",
-                detail: "Full-building acquisition. Closed 45 days ahead of schedule.",
+                detail:
+                  "Full-building acquisition. Closed 45 days ahead of schedule.",
                 tag: "Investment Sales",
               },
               {
                 ref: stat150k.ref,
                 count: stat150k.count,
+                started: stat150k.started,
                 prefix: "",
                 suffix: "K SQFT",
                 title: "Commercial Leased",
-                detail: "23% above market rate. Multi-floor lease in Hudson Yards.",
+                detail:
+                  "23% above market rate. Multi-floor lease in Hudson Yards.",
                 tag: "Commercial Lease",
               },
               {
                 ref: stat94.ref,
                 count: stat94.count,
+                started: stat94.started,
                 prefix: "",
                 suffix: "%",
                 title: "Pre-Sale Rate",
-                detail: "47 of 50 units sold before completion. Zero price reductions.",
+                detail:
+                  "47 of 50 units sold before completion. Zero price reductions.",
                 tag: "Development",
               },
             ].map((deal, i) => (
@@ -479,9 +536,9 @@ const HomeV7 = () => {
                 </div>
                 <div className="font-display text-5xl md:text-6xl font-light text-white mb-3 tracking-tight">
                   <span ref={deal.ref}>
-                    {deal.prefix}
-                    {deal.count.toLocaleString()}
-                    {deal.suffix}
+                    {deal.started
+                      ? `${deal.prefix}${deal.count.toLocaleString()}${deal.suffix}`
+                      : "\u00A0"}
                   </span>
                 </div>
                 <div className="font-display text-lg text-neutral-300 mb-3">
@@ -502,6 +559,7 @@ const HomeV7 = () => {
       <section
         className="py-24 md:py-32 border-y"
         style={{ borderColor: "rgba(255,255,255,0.06)" }}
+        aria-label="Client testimonials"
       >
         <div className="executive-container">
           <motion.div
@@ -548,6 +606,7 @@ const HomeV7 = () => {
               >
                 <div
                   className="absolute left-0 top-0 bottom-0 w-[2px]"
+                  aria-hidden="true"
                   style={{ background: PIPE }}
                 />
                 <p className="font-body text-neutral-300 text-base leading-relaxed italic mb-6">
@@ -570,50 +629,56 @@ const HomeV7 = () => {
       {/* ================================================================
           MARQUEE — Neighborhoods ticker
           ================================================================ */}
-      <section className="py-12 overflow-hidden">
-        <motion.div
-          className="flex items-center gap-0 whitespace-nowrap"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
-        >
-          {[...Array(2)].map((_, dupeIdx) => (
-            <div key={dupeIdx} className="flex items-center gap-0">
-              {[
-                "Tribeca",
-                "SoHo",
-                "Chelsea",
-                "Midtown",
-                "Hudson Yards",
-                "Upper West Side",
-                "Financial District",
-                "Brooklyn Heights",
-                "Williamsburg",
-                "Greenwich Village",
-              ].map((hood) => (
-                <span
-                  key={`${dupeIdx}-${hood}`}
-                  className="flex items-center"
-                >
-                  <span className="font-display text-2xl md:text-3xl text-neutral-800 px-6">
-                    {hood}
+      <section
+        className="py-12 overflow-hidden"
+        aria-label="Neighborhoods served"
+      >
+        <div className="overflow-hidden">
+          <motion.div
+            className="flex items-center gap-0 whitespace-nowrap w-max"
+            animate={{ x: ["0%", "-50%"] }}
+            transition={{
+              duration: 35,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
+            {[0, 1].map((dupeIdx) => (
+              <div
+                key={dupeIdx}
+                className="flex items-center gap-0"
+                aria-hidden={dupeIdx === 1 ? "true" : undefined}
+              >
+                {NEIGHBORHOODS.map((hood) => (
+                  <span
+                    key={`${dupeIdx}-${hood}`}
+                    className="flex items-center flex-shrink-0"
+                  >
+                    <span className="font-display text-2xl md:text-3xl text-neutral-800 px-6">
+                      {hood}
+                    </span>
+                    <span
+                      className="text-lg font-light"
+                      style={{ color: PIPE }}
+                      aria-hidden="true"
+                    >
+                      |
+                    </span>
                   </span>
-                  <span className="text-lg font-light" style={{ color: PIPE }}>
-                    |
-                  </span>
-                </span>
-              ))}
-            </div>
-          ))}
-        </motion.div>
+                ))}
+              </div>
+            ))}
+          </motion.div>
+        </div>
       </section>
 
       {/* ================================================================
           7. CTA — Pipe-framed box, clean and direct
           ================================================================ */}
-      <section className="py-24 md:py-32">
+      <section className="py-24 md:py-32" aria-label="Call to action">
         <div className="executive-container">
           <motion.div
-            className="relative border p-12 md:p-20 text-center"
+            className="relative border p-8 sm:p-12 md:p-20 text-center"
             style={{ borderColor: "rgba(255,255,255,0.08)" }}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -632,6 +697,7 @@ const HomeV7 = () => {
                 ease: [0.22, 1, 0.36, 1],
               }}
               viewport={{ once: true }}
+              aria-hidden="true"
             />
             <motion.div
               className="absolute top-0 left-0 h-[3px] origin-left"
@@ -644,6 +710,7 @@ const HomeV7 = () => {
                 ease: [0.22, 1, 0.36, 1],
               }}
               viewport={{ once: true }}
+              aria-hidden="true"
             />
             {/* Corner pipe accents — bottom-right */}
             <motion.div
@@ -657,6 +724,7 @@ const HomeV7 = () => {
                 ease: [0.22, 1, 0.36, 1],
               }}
               viewport={{ once: true }}
+              aria-hidden="true"
             />
             <motion.div
               className="absolute bottom-0 right-0 h-[3px] origin-right"
@@ -669,30 +737,35 @@ const HomeV7 = () => {
                 ease: [0.22, 1, 0.36, 1],
               }}
               viewport={{ once: true }}
+              aria-hidden="true"
             />
 
             <h2 className="font-display text-display-md text-white mb-6">
               Ready to make
               <br />
               <span className="italic font-light">your move</span>
-              <span style={{ color: PIPE }}>?</span>
+              <span style={{ color: PIPE }} aria-hidden="true">?</span>
             </h2>
             <p className="font-body text-neutral-500 mb-10 max-w-lg mx-auto text-base md:text-lg leading-relaxed">
               Whether you are buying, selling, or investing -- we bring
               institutional rigor and personal commitment to every engagement.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/listings/commercial" onClick={scrollToTop}>
-                <button className="group flex items-center gap-3 bg-white text-neutral-950 px-10 py-4 text-sm font-medium uppercase tracking-wider hover:bg-neutral-200 transition-colors duration-200">
-                  View Properties
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
-                </button>
+              <Link
+                href="/listings/commercial"
+                onClick={scrollToTop}
+                className="group inline-flex items-center gap-3 bg-white text-neutral-950 px-10 py-4 text-sm font-medium uppercase tracking-wider hover:bg-neutral-200 transition-colors duration-200"
+              >
+                View Properties
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
               </Link>
-              <Link href="/contact" onClick={scrollToTop}>
-                <button className="flex items-center gap-3 border border-neutral-700 hover:border-neutral-500 text-neutral-400 hover:text-white px-10 py-4 text-sm uppercase tracking-wider transition-all duration-200">
-                  <Phone className="w-4 h-4" />
-                  Contact Us
-                </button>
+              <Link
+                href="/contact"
+                onClick={scrollToTop}
+                className="inline-flex items-center gap-3 border border-neutral-700 hover:border-neutral-500 text-neutral-400 hover:text-white px-10 py-4 text-sm uppercase tracking-wider transition-all duration-200"
+              >
+                <Phone className="w-4 h-4" aria-hidden="true" />
+                Contact Us
               </Link>
             </div>
           </motion.div>

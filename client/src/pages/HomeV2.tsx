@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
   ArrowUpRight,
-  Building,
   MapPin,
   Phone,
   Mail,
@@ -154,7 +153,7 @@ const HomeV2 = () => {
       {/* ============================================================
           HERO - CINEMATIC FULL-BLEED WITH PARALLAX
           ============================================================ */}
-      <section ref={heroRef} className="relative h-screen min-h-[700px] overflow-hidden" data-testid="hero">
+      <section ref={heroRef} className="relative h-screen min-h-[700px] overflow-hidden" data-testid="hero" aria-label="Hero section">
         {/* Parallax Background */}
         <motion.div
           className="absolute inset-0 z-0"
@@ -196,8 +195,7 @@ const HomeV2 = () => {
               className="mb-6"
             >
               <span
-                className="inline-block px-4 py-1.5 text-xs tracking-[0.3em] uppercase border border-white/30 text-white/80 backdrop-blur-sm"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                className="inline-block px-4 py-1.5 text-xs tracking-[0.3em] uppercase border border-white/30 text-white/80 backdrop-blur-sm font-body"
               >
                 Est. 2018 &mdash; New York City
               </span>
@@ -206,22 +204,20 @@ const HomeV2 = () => {
             {/* Main headline - overlapping, editorial layout */}
             <div className="relative max-w-5xl">
               <motion.h1
-                className="text-display-xl text-white leading-[0.85] tracking-[-0.04em]"
-                style={{ fontFamily: "'Playfair Display', serif" }}
+                className="text-display-xl text-white leading-[0.85] tracking-[-0.04em] font-display"
                 initial={{ opacity: 0, y: 80, clipPath: "inset(100% 0 0 0)" }}
                 animate={{ opacity: 1, y: 0, clipPath: "inset(0% 0 0 0)" }}
                 transition={{ duration: 1.2, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
               >
                 Built on
                 <br />
-                <span className="italic" style={{ color: "hsl(0, 100%, 65%)" }}>
+                <span className="italic text-accent">
                   Trust.
                 </span>
               </motion.h1>
 
               <motion.h2
-                className="text-display-md text-white/70 mt-2 md:mt-4 md:ml-[15%]"
-                style={{ fontFamily: "'Libre Baskerville', serif" }}
+                className="text-display-md text-white/70 mt-2 md:mt-4 md:ml-[15%] font-display"
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
@@ -233,8 +229,7 @@ const HomeV2 = () => {
 
             {/* Subtext - offset to the right for asymmetry */}
             <motion.p
-              className="max-w-lg text-white/60 text-base md:text-lg mt-8 md:ml-[5%] leading-relaxed"
-              style={{ fontFamily: "'Outfit', sans-serif" }}
+              className="max-w-lg text-white/60 text-base md:text-lg mt-8 md:ml-[5%] leading-relaxed font-body"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
@@ -259,9 +254,8 @@ const HomeV2 = () => {
                 >
                   <Button
                     size="lg"
-                    className="relative overflow-hidden bg-[hsl(0,100%,40%)] hover:bg-[hsl(0,100%,35%)] text-white px-8 py-6 text-sm tracking-[0.15em] uppercase rounded-none border-0 group"
+                    className="relative overflow-hidden bg-accent hover:bg-accent/90 text-white px-8 py-6 text-sm tracking-[0.15em] uppercase rounded-none border-0 group font-body"
                     data-testid="hero-cta-primary"
-                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                   >
                     <span className="relative z-10 flex items-center gap-3">
                       Learn More
@@ -281,8 +275,7 @@ const HomeV2 = () => {
                 <Button
                   variant="ghost"
                   size="lg"
-                  className="text-white/80 hover:text-white hover:bg-white/10 px-8 py-6 text-sm tracking-[0.15em] uppercase rounded-none border border-white/20"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  className="text-white/80 hover:text-white hover:bg-white/10 px-8 py-6 text-sm tracking-[0.15em] uppercase rounded-none border border-white/20 font-body"
                 >
                   View Listings
                 </Button>
@@ -322,14 +315,12 @@ const HomeV2 = () => {
               transition={{ duration: 0.6, delay: 2 + i * 0.15 }}
             >
               <div
-                className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight"
-                style={{ fontFamily: "'Playfair Display', serif" }}
+                className="text-2xl md:text-3xl font-bold text-white/90 tracking-tight font-display"
               >
                 {stat.val}
               </div>
               <div
-                className="text-[10px] uppercase tracking-[0.3em] text-white/40 mt-1"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                className="text-[10px] uppercase tracking-[0.3em] text-white/40 mt-1 font-body"
               >
                 {stat.label}
               </div>
@@ -341,7 +332,7 @@ const HomeV2 = () => {
       {/* ============================================================
           STATS / CREDIBILITY - ANIMATED COUNTERS
           ============================================================ */}
-      <section className="relative py-24 md:py-32 bg-neutral-950 dark:bg-neutral-950 overflow-hidden" data-testid="success-metrics">
+      <section className="relative py-24 md:py-32 bg-neutral-950 dark:bg-neutral-950 overflow-hidden" data-testid="success-metrics" aria-label="Success metrics">
         {/* Diagonal accent line */}
         <div
           className="absolute top-0 left-0 w-full h-[1px]"
@@ -366,17 +357,15 @@ const HomeV2 = () => {
         <div className="executive-container relative z-10">
           <RevealSection>
             <div
-              className="text-xs tracking-[0.4em] uppercase text-[hsl(0,100%,55%)] mb-4"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              className="text-xs tracking-[0.4em] uppercase text-accent mb-4 font-body"
             >
               Track Record
             </div>
             <h2
-              className="text-display-md text-white max-w-2xl mb-16 md:mb-20"
-              style={{ fontFamily: "'Playfair Display', serif" }}
+              className="text-display-md text-white max-w-2xl mb-16 md:mb-20 font-display"
             >
               We decode value, forecast opportunity, and{" "}
-              <span className="italic" style={{ color: "hsl(0, 100%, 65%)" }}>
+              <span className="italic text-accent">
                 execute with precision.
               </span>
             </h2>
@@ -427,25 +416,19 @@ const HomeV2 = () => {
                 variants={staggerItem}
               >
                 <div
-                  className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-3"
-                  style={{
-                    fontFamily: "'Playfair Display', serif",
-                    color: "hsl(0, 100%, 60%)",
-                  }}
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-3 font-display text-accent"
                 >
                   {stat.prefix}
                   {stat.value.toLocaleString()}
                   {stat.suffix}
                 </div>
                 <div
-                  className="text-white/90 text-sm font-medium mb-1"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}
+                  className="text-white/90 text-sm font-medium mb-1 font-body"
                 >
                   {stat.label}
                 </div>
                 <div
-                  className="text-white/40 text-xs tracking-wider uppercase"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  className="text-white/40 text-xs tracking-wider uppercase font-body"
                 >
                   {stat.detail}
                 </div>
@@ -468,25 +451,22 @@ const HomeV2 = () => {
             ].map((metric) => (
               <motion.div
                 key={metric.label}
-                className="relative border border-white/[0.08] p-8 group hover:border-[hsl(0,100%,40%,0.3)] transition-all duration-500"
+                className="relative border border-white/[0.08] p-8 group hover:border-accent/30 transition-all duration-500"
                 variants={staggerItem}
               >
-                <div className="absolute top-0 left-0 w-0 h-[2px] bg-[hsl(0,100%,40%)] group-hover:w-full transition-all duration-700" />
+                <div className="absolute top-0 left-0 w-0 h-[2px] bg-accent group-hover:w-full transition-all duration-700" />
                 <div
-                  className="text-3xl md:text-4xl font-bold text-white mb-2"
-                  style={{ fontFamily: "'Playfair Display', serif" }}
+                  className="text-3xl md:text-4xl font-bold text-white mb-2 font-display"
                 >
                   {metric.value}
                 </div>
                 <div
-                  className="text-white/70 text-sm font-medium mb-1"
-                  style={{ fontFamily: "'Outfit', sans-serif" }}
+                  className="text-white/70 text-sm font-medium mb-1 font-body"
                 >
                   {metric.label}
                 </div>
                 <div
-                  className="text-white/40 text-xs"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  className="text-white/40 text-xs font-body"
                 >
                   {metric.detail}
                 </div>
@@ -502,6 +482,7 @@ const HomeV2 = () => {
       <section
         id="featured-section"
         className="relative py-24 md:py-32 bg-white dark:bg-neutral-950"
+        aria-label="Featured properties"
       >
         {/* Diagonal accent */}
         <div
@@ -516,17 +497,15 @@ const HomeV2 = () => {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
             <RevealSection>
               <div
-                className="text-xs tracking-[0.4em] uppercase text-[hsl(352,60%,28%)] dark:text-[hsl(0,100%,55%)] mb-4"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                className="text-xs tracking-[0.4em] uppercase text-accent mb-4 font-body"
               >
                 Portfolio
               </div>
               <h2
-                className="text-display-md text-neutral-900 dark:text-white max-w-xl"
-                style={{ fontFamily: "'Playfair Display', serif" }}
+                className="text-display-md text-neutral-900 dark:text-white max-w-xl font-display"
               >
                 Featured{" "}
-                <span className="italic" style={{ color: "hsl(0, 100%, 40%)" }}>
+                <span className="italic text-accent">
                   Properties
                 </span>
               </h2>
@@ -535,8 +514,7 @@ const HomeV2 = () => {
             <RevealSection delay={0.15}>
               <Link href="/listings" onClick={scrollToTop}>
                 <span
-                  className="inline-flex items-center gap-2 text-sm tracking-[0.15em] uppercase text-neutral-500 dark:text-white/50 hover:text-[hsl(0,100%,40%)] transition-colors group cursor-pointer"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  className="inline-flex items-center gap-2 text-sm tracking-[0.15em] uppercase text-neutral-500 dark:text-white/50 hover:text-accent transition-colors group cursor-pointer font-body"
                 >
                   View All
                   <ArrowUpRight className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -554,7 +532,7 @@ const HomeV2 = () => {
       {/* ============================================================
           EDITORIAL SPLIT - BRAND STORY
           ============================================================ */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden" aria-label="Our approach">
         <div className="grid lg:grid-cols-2 min-h-[600px]">
           {/* Image side */}
           <RevealSection className="relative overflow-hidden">
@@ -580,8 +558,7 @@ const HomeV2 = () => {
               transition={{ duration: 0.6, delay: 0.4 }}
             >
               <div
-                className="inline-block px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs tracking-[0.2em] uppercase"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                className="inline-block px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs tracking-[0.2em] uppercase font-body"
               >
                 <MapPin className="w-3 h-3 inline mr-2" />
                 Manhattan, NYC
@@ -593,23 +570,20 @@ const HomeV2 = () => {
           <div className="bg-neutral-950 flex items-center p-10 md:p-16 lg:p-20">
             <RevealSection delay={0.2}>
               <div
-                className="text-xs tracking-[0.4em] uppercase text-[hsl(0,100%,55%)] mb-6"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                className="text-xs tracking-[0.4em] uppercase text-accent mb-6 font-body"
               >
                 Our Approach
               </div>
               <h2
-                className="text-display-md text-white leading-tight mb-8"
-                style={{ fontFamily: "'Playfair Display', serif" }}
+                className="text-display-md text-white leading-tight mb-8 font-display"
               >
                 Institutional discipline.{" "}
-                <span className="italic block" style={{ color: "hsl(0, 100%, 65%)" }}>
+                <span className="italic block text-accent">
                   Entrepreneurial drive.
                 </span>
               </h2>
               <p
-                className="text-white/50 text-base md:text-lg leading-relaxed mb-8 max-w-md"
-                style={{ fontFamily: "'Outfit', sans-serif" }}
+                className="text-white/50 text-base md:text-lg leading-relaxed mb-8 max-w-md font-body"
               >
                 We decode value, forecast opportunity, and execute with precision.
                 Data and technology backed by tenacity and trust -- applied to New
@@ -625,14 +599,13 @@ const HomeV2 = () => {
                 ].map((item, i) => (
                   <motion.div
                     key={item}
-                    className="flex items-start gap-3 text-white/60 text-sm"
-                    style={{ fontFamily: "'Outfit', sans-serif" }}
+                    className="flex items-start gap-3 text-white/60 text-sm font-body"
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
                   >
-                    <div className="w-1.5 h-1.5 rounded-full bg-[hsl(0,100%,40%)] mt-1.5 flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 flex-shrink-0" />
                     <span>{item}</span>
                   </motion.div>
                 ))}
@@ -641,8 +614,7 @@ const HomeV2 = () => {
               <Link href="/services" onClick={scrollToTop}>
                 <Button
                   variant="ghost"
-                  className="text-white/70 hover:text-white hover:bg-white/5 px-0 text-sm tracking-[0.15em] uppercase rounded-none border-b border-white/20 hover:border-white/50 transition-all group"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  className="text-white/70 hover:text-white hover:bg-white/5 px-0 text-sm tracking-[0.15em] uppercase rounded-none border-b border-white/20 hover:border-white/50 transition-all group font-body"
                 >
                   Our Services
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -656,7 +628,7 @@ const HomeV2 = () => {
       {/* ============================================================
           AGENT SPOTLIGHT - CREATIVE CARDS
           ============================================================ */}
-      <section className="relative py-24 md:py-32 bg-white dark:bg-neutral-950 overflow-hidden">
+      <section className="relative py-24 md:py-32 bg-white dark:bg-neutral-950 overflow-hidden" aria-label="Our team">
         {/* Background accent */}
         <div
           className="absolute top-0 left-0 w-1/2 h-full opacity-[0.015] dark:opacity-[0.03]"
@@ -670,23 +642,20 @@ const HomeV2 = () => {
             {/* Left column - header */}
             <RevealSection className="lg:sticky lg:top-32">
               <div
-                className="text-xs tracking-[0.4em] uppercase text-[hsl(352,60%,28%)] dark:text-[hsl(0,100%,55%)] mb-4"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                className="text-xs tracking-[0.4em] uppercase text-accent mb-4 font-body"
               >
                 The Team
               </div>
               <h2
-                className="text-display-md text-neutral-900 dark:text-white mb-6"
-                style={{ fontFamily: "'Playfair Display', serif" }}
+                className="text-display-md text-neutral-900 dark:text-white mb-6 font-display"
               >
                 Meet our{" "}
-                <span className="italic" style={{ color: "hsl(0, 100%, 40%)" }}>
+                <span className="italic text-accent">
                   agents.
                 </span>
               </h2>
               <p
-                className="text-neutral-500 dark:text-white/50 text-base leading-relaxed mb-8 max-w-sm"
-                style={{ fontFamily: "'Outfit', sans-serif" }}
+                className="text-neutral-500 dark:text-white/50 text-base leading-relaxed mb-8 max-w-sm font-body"
               >
                 Our team brings decades of combined experience navigating New York
                 City's most competitive real estate markets.
@@ -694,8 +663,7 @@ const HomeV2 = () => {
               <Link href="/agents" onClick={scrollToTop}>
                 <Button
                   variant="ghost"
-                  className="text-neutral-600 dark:text-white/60 hover:text-[hsl(0,100%,40%)] px-0 text-sm tracking-[0.15em] uppercase rounded-none border-b border-neutral-300 dark:border-white/20 hover:border-[hsl(0,100%,40%)] transition-all group"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  className="text-neutral-600 dark:text-white/60 hover:text-accent px-0 text-sm tracking-[0.15em] uppercase rounded-none border-b border-neutral-300 dark:border-white/20 hover:border-accent transition-all group font-body"
                 >
                   View All Agents
                   <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
@@ -744,23 +712,17 @@ const HomeV2 = () => {
                     {/* Content - slides up on hover */}
                     <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                       <div
-                        className="text-xs tracking-[0.3em] uppercase mb-2"
-                        style={{
-                          fontFamily: "'Space Grotesk', sans-serif",
-                          color: "hsl(0, 100%, 65%)",
-                        }}
+                        className="text-xs tracking-[0.3em] uppercase mb-2 font-body text-accent"
                       >
                         {agent.speciality}
                       </div>
                       <h3
-                        className="text-xl md:text-2xl text-white font-medium mb-1"
-                        style={{ fontFamily: "'Playfair Display', serif" }}
+                        className="text-xl md:text-2xl text-white font-medium mb-1 font-display"
                       >
                         {agent.name}
                       </h3>
                       <p
-                        className="text-white/60 text-sm"
-                        style={{ fontFamily: "'Outfit', sans-serif" }}
+                        className="text-white/60 text-sm font-body"
                       >
                         {agent.title}
                       </p>
@@ -792,7 +754,7 @@ const HomeV2 = () => {
       {/* ============================================================
           MARKET TICKER - HORIZONTAL SCROLL MARQUEE
           ============================================================ */}
-      <section className="relative py-6 bg-neutral-100 dark:bg-neutral-900 overflow-hidden border-y border-neutral-200 dark:border-neutral-800">
+      <section className="relative py-6 bg-neutral-100 dark:bg-neutral-900 overflow-hidden border-y border-neutral-200 dark:border-neutral-800" aria-label="Market areas">
         <motion.div
           className="flex whitespace-nowrap gap-16"
           animate={{ x: ["0%", "-50%"] }}
@@ -814,13 +776,11 @@ const HomeV2 = () => {
               ].map((text, i) => (
                 <span
                   key={`${setIdx}-${i}`}
-                  className="text-sm tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-600 flex items-center gap-4"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  className="text-sm tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-600 flex items-center gap-4 font-body"
                 >
                   {text}
                   <span
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ background: "hsl(0, 100%, 40%)" }}
+                    className="w-1.5 h-1.5 rounded-full bg-accent"
                   />
                 </span>
               ))}
@@ -832,7 +792,7 @@ const HomeV2 = () => {
       {/* ============================================================
           CTA SECTION - VISUALLY STRIKING
           ============================================================ */}
-      <section className="relative py-32 md:py-44 overflow-hidden">
+      <section className="relative py-32 md:py-44 overflow-hidden" aria-label="Call to action">
         {/* Dark background with brand gradient */}
         <div className="absolute inset-0 bg-neutral-950" />
         <div
@@ -864,8 +824,7 @@ const HomeV2 = () => {
 
         {/* Large decorative text behind */}
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20vw] font-bold text-white/[0.02] select-none pointer-events-none whitespace-nowrap"
-          style={{ fontFamily: "'Playfair Display', serif" }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20vw] font-bold text-white/[0.02] select-none pointer-events-none whitespace-nowrap font-display"
         >
           BRAVADO
         </div>
@@ -873,25 +832,22 @@ const HomeV2 = () => {
         <div className="executive-container relative z-10 text-center">
           <RevealSection>
             <div
-              className="text-xs tracking-[0.4em] uppercase text-[hsl(0,100%,55%)] mb-6"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              className="text-xs tracking-[0.4em] uppercase text-accent mb-6 font-body"
             >
               Start Your Journey
             </div>
 
             <h2
-              className="text-display-lg text-white max-w-3xl mx-auto mb-8"
-              style={{ fontFamily: "'Playfair Display', serif" }}
+              className="text-display-lg text-white max-w-3xl mx-auto mb-8 font-display"
             >
               Ready to make your{" "}
-              <span className="italic" style={{ color: "hsl(0, 100%, 65%)" }}>
+              <span className="italic text-accent">
                 next move?
               </span>
             </h2>
 
             <p
-              className="text-white/50 text-base md:text-lg max-w-xl mx-auto mb-12 leading-relaxed"
-              style={{ fontFamily: "'Outfit', sans-serif" }}
+              className="text-white/50 text-base md:text-lg max-w-xl mx-auto mb-12 leading-relaxed font-body"
             >
               Whether buying, selling, or leasing -- our team is ready to deliver
               results that exceed expectations.
@@ -901,8 +857,7 @@ const HomeV2 = () => {
               <Link href="/contact" onClick={scrollToTop}>
                 <Button
                   size="lg"
-                  className="bg-[hsl(0,100%,40%)] hover:bg-[hsl(0,100%,35%)] text-white px-10 py-6 text-sm tracking-[0.15em] uppercase rounded-none border-0"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  className="bg-accent hover:bg-accent/90 text-white px-10 py-6 text-sm tracking-[0.15em] uppercase rounded-none border-0 font-body"
                 >
                   Contact Us
                   <ArrowRight className="w-4 h-4 ml-3" />
@@ -913,8 +868,7 @@ const HomeV2 = () => {
                 <Button
                   variant="ghost"
                   size="lg"
-                  className="text-white/60 hover:text-white hover:bg-white/5 px-10 py-6 text-sm tracking-[0.15em] uppercase rounded-none border border-white/15 hover:border-white/30"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  className="text-white/60 hover:text-white hover:bg-white/5 px-10 py-6 text-sm tracking-[0.15em] uppercase rounded-none border border-white/15 hover:border-white/30 font-body"
                 >
                   Join Our Team
                 </Button>

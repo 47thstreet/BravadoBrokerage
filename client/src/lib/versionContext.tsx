@@ -26,8 +26,8 @@ export function useVersion() {
 }
 
 export const VERSION_LABELS: Record<SiteVersion, string> = {
-  v1: "Original",
-  v2: "Emil Kowalski",
-  v3: "UI/UX Pro Max",
-  v4: "CRO Optimized",
+  v1: "v1",
+  v2: "v2",
+  v3: "v3",
+  v4: "v4",
 };

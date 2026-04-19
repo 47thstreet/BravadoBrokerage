@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { Facebook, Instagram, Linkedin } from "lucide-react";
+import BRELogo from "@/components/BRELogo";
 
 const Footer = () => {
   return (
@@ -9,11 +10,7 @@ const Footer = () => {
         <div className="grid lg:grid-cols-12 gap-12 mb-16">
           {/* Logo Section - Takes 4 columns, pushing content right */}
           <div className="lg:col-span-4 flex items-start">
-            <img
-              src="/attached_assets/smallo_1757979641363.png"
-              alt="Bravado Real Estate"
-              className="h-40 w-auto brightness-0 invert"
-            />
+            <BRELogo size="lg" />
           </div>
           
           {/* Company Section */}

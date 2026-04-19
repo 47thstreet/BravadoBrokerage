@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useVersion, VERSION_LABELS, type SiteVersion } from "@/lib/versionContext";
+import BRELogo from "@/components/BRELogo";
 
 const Navigation = () => {
   const [location] = useLocation();
@@ -46,11 +47,7 @@ const Navigation = () => {
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center" onClick={scrollToTop} data-testid="logo-link">
-              <img
-                src="/attached_assets/smallo_1757979641363.png"
-                alt="Bravado Real Estate"
-                className="h-16 w-auto brightness-0 invert"
-              />
+              <BRELogo size="md" />
             </Link>
             {/* Version Switcher — click to toggle */}
             <div className="relative">

@@ -43,10 +43,10 @@ const Navigation = () => {
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center" onClick={scrollToTop} data-testid="logo-link">
-              <img 
-                src="/attached_assets/smallo_1757979641363.png" 
-                alt="Bravado Real Estate" 
-                className="h-16 w-auto"
+              <img
+                src="/attached_assets/smallo_1757979641363.png"
+                alt="Bravado Real Estate"
+                className="h-16 w-auto brightness-0 invert"
               />
             </Link>
           </div>

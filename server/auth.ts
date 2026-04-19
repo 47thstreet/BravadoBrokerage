@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { type Request, type Response, type NextFunction } from "express";
 
 const SALT_ROUNDS = 10;

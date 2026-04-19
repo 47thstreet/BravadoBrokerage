@@ -2,14 +2,20 @@ import { type Property, type InsertProperty, type Agent, type InsertAgent, type 
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { eq, and, gte, lte, sql, desc } from "drizzle-orm";
 import { Pool, neonConfig } from "@neondatabase/serverless";
-import ws from "ws";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is required but not set");
 }
 
-// Configure WebSocket for Node.js environment
-neonConfig.webSocketConstructor = ws;
+// Configure WebSocket - use native fetch for serverless, ws for Node.js
+if (typeof globalThis.WebSocket === 'undefined') {
+  try {
+    const ws = await import("ws");
+    neonConfig.webSocketConstructor = ws.default;
+  } catch {
+    // In serverless environments without ws, Neon uses fetch fallback
+  }
+}
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const db = drizzle(pool);

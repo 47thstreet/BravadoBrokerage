@@ -9,5 +9,4 @@ vite.config.ts.*
 .vercel
 .replit
 .local
-api/*.js
 .env*.local

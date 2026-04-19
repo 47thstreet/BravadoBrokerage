@@ -1,17 +1,14 @@
 {
-  "buildCommand": "vite build",
+  "buildCommand": "npm run build:all",
   "outputDirectory": "dist/public",
   "framework": "vite",
   "functions": {
-    "api/**/*.ts": {
-      "maxDuration": 30,
-      "includeFiles": "shared/**,server/**"
+    "api/index.mjs": {
+      "maxDuration": 30
     }
   },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api" },
-    { "source": "/objects/(.*)", "destination": "/api" },
-    { "source": "/public-objects/(.*)", "destination": "/api" },
+    { "source": "/api/(.*)", "destination": "/api/index.mjs" },
     { "source": "/((?!assets|attached_assets|favicon).*)", "destination": "/index.html" }
   ]
 }

@@ -5,6 +5,7 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/objects/(.*)", "destination": "/api" },
-    { "source": "/public-objects/(.*)", "destination": "/api" }
+    { "source": "/public-objects/(.*)", "destination": "/api" },
+    { "source": "/((?!assets|attached_assets|favicon).*)", "destination": "/index.html" }
   ]
 }

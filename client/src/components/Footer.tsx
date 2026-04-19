@@ -15,7 +15,7 @@ const Footer = () => {
           
           {/* Company Section */}
           <div className="lg:col-span-2">
-            <h4 className="font-display text-body-lg text-white mb-6">Company</h4>
+            <h4 className="font-display text-body-lg text-white mb-6"><span className="text-red-600 mr-1">|</span>Company</h4>
             <ul className="space-y-3">
               <li><Link href="/about" className="text-body-sm text-white hover:text-accent transition-colors" data-testid="footer-link-about">About Us</Link></li>
               <li><Link href="/agents" className="text-body-sm text-white hover:text-accent transition-colors" data-testid="footer-link-team">Our team</Link></li>
@@ -26,7 +26,7 @@ const Footer = () => {
           
           {/* Explore Section */}
           <div className="lg:col-span-2">
-            <h4 className="font-display text-body-lg text-white mb-6">Explore</h4>
+            <h4 className="font-display text-body-lg text-white mb-6"><span className="text-red-600 mr-1">|</span>Explore</h4>
             <ul className="space-y-3">
               <li><Link href="/markets" className="text-body-sm text-white hover:text-accent transition-colors" data-testid="footer-link-markets">Markets</Link></li>
               <li><Link href="/subscription" className="text-body-sm text-white hover:text-accent transition-colors" data-testid="footer-link-subscribe">Subscribe</Link></li>
@@ -35,7 +35,7 @@ const Footer = () => {
           
           {/* Contact Section */}
           <div className="lg:col-span-2">
-            <h4 className="font-display text-body-lg text-white mb-6">Contact</h4>
+            <h4 className="font-display text-body-lg text-white mb-6"><span className="text-red-600 mr-1">|</span>Contact</h4>
             <ul className="space-y-3">
               <li><Link href="/agents" className="text-body-sm text-white hover:text-accent transition-colors" data-testid="footer-find-agent-link">Find an Agent</Link></li>
               <li><Link href="/contact" className="text-body-sm text-white hover:text-accent transition-colors" data-testid="footer-contact-link">Contact Us</Link></li>
@@ -45,7 +45,7 @@ const Footer = () => {
           
           {/* Social Section */}
           <div className="lg:col-span-2">
-            <h4 className="font-display text-body-lg text-white mb-6">Follow</h4>
+            <h4 className="font-display text-body-lg text-white mb-6"><span className="text-red-600 mr-1">|</span>Follow</h4>
             <div className="flex space-x-4">
               <button className="text-white hover:text-accent transition-colors" data-testid="social-facebook">
                 <Facebook className="h-5 w-5" />
@@ -61,7 +61,10 @@ const Footer = () => {
         </div>
         
         {/* Footer Bottom */}
-        <div className="border-t border-neutral-800 pt-8">
+        <div className="border-t border-neutral-800 pt-8 relative">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black px-3">
+            <span className="text-red-600 text-lg font-light">|</span>
+          </div>
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-body-sm text-neutral-400" data-testid="copyright">&copy; 2018 Bravado Real Estate. All rights reserved.</p>
             <div className="flex space-x-6">

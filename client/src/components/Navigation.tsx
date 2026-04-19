@@ -149,12 +149,13 @@ const Navigation = () => {
                     <Link
                       href={item.href!}
                       className={cn(
-                        "px-1 py-2 text-body-sm font-medium hover:text-accent transition-colors",
-                        isActive(item.href) ? "text-accent" : "text-white dark:text-white"
+                        "px-1 py-2 text-body-sm font-medium hover:text-white transition-colors flex items-center gap-1.5",
+                        isActive(item.href) ? "text-white" : "text-neutral-400"
                       )}
                       onClick={scrollToTop}
                       data-testid={`nav-link-${item.name.toLowerCase().replace(" ", "-")}`}
                     >
+                      {isActive(item.href) && <span className="text-red-600 font-light">|</span>}
                       {item.name}
                     </Link>
                   )}

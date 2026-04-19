@@ -530,7 +530,7 @@ const HomeV9 = () => {
                 </motion.div>
               </Link>
 
-              <a href="tel:+12125551234">
+              <a href="tel:+12125551234" aria-label="Call us at (212) 555-1234">
                 <motion.div
                   ref={magneticSecondary.ref}
                   style={{ x: magneticSecondary.springX, y: magneticSecondary.springY }}
@@ -1394,7 +1394,7 @@ const HomeV9 = () => {
                 Get a free, no-obligation consultation with a senior Bravado
                 agent. We will discuss your goals, timeline, and strategy.
               </p>
-              <a href="tel:+12125551234" className="w-full">
+              <a href="tel:+12125551234" className="w-full" aria-label="Schedule a consultation call">
                 <Button
                   size="lg"
                   className="bg-transparent border-2 border-[hsl(0,100%,45%)] text-[hsl(0,100%,55%)] hover:bg-[hsl(0,100%,45%)] hover:text-white w-full py-6 text-sm tracking-[0.15em] uppercase rounded-none font-body transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[hsl(0,100%,45%)] focus:ring-offset-2 focus:ring-offset-neutral-950"
@@ -1427,6 +1427,7 @@ const HomeV9 = () => {
               <a
                 href="tel:+12125551234"
                 className="font-semibold text-white hover:text-[hsl(0,100%,55%)] transition-colors focus:outline-none focus:underline"
+                aria-label="Call us at (212) 555-1234"
               >
                 (212) 555-1234
               </a>
@@ -1435,7 +1436,7 @@ const HomeV9 = () => {
               <span>Available 7 days a week</span>
             </div>
             <div className="flex items-center gap-3 w-full sm:w-auto">
-              <a href="tel:+12125551234" className="sm:hidden flex-1">
+              <a href="tel:+12125551234" className="sm:hidden flex-1" aria-label="Call Bravado now">
                 <Button
                   variant="outline"
                   className="w-full border-[hsl(0,100%,45%)] text-[hsl(0,100%,55%)] bg-transparent rounded-none focus:outline-none focus:ring-2 focus:ring-[hsl(0,100%,45%)]"
@@ -1524,6 +1525,7 @@ const HomeV9 = () => {
                 <Button
                   type="submit"
                   className="bg-[hsl(0,100%,45%)] hover:bg-[hsl(0,100%,38%)] text-white w-full py-6 text-sm tracking-[0.1em] uppercase rounded-none font-body focus:outline-none focus:ring-2 focus:ring-white/50"
+                  aria-label="Subscribe to get free market report"
                 >
                   Get Free Market Report
                 </Button>

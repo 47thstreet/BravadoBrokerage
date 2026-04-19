@@ -153,7 +153,7 @@ const HomeV2 = () => {
       {/* ============================================================
           HERO - CINEMATIC FULL-BLEED WITH PARALLAX
           ============================================================ */}
-      <section ref={heroRef} className="relative h-screen min-h-[700px] overflow-hidden" data-testid="hero" aria-label="Hero section">
+      <section ref={heroRef} className="relative h-screen min-h-[700px] overflow-hidden" data-testid="hero">
         {/* Parallax Background */}
         <motion.div
           className="absolute inset-0 z-0"
@@ -162,6 +162,8 @@ const HomeV2 = () => {
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${HERO_BG})` }}
+            role="img"
+            aria-label="Aerial view of New York City skyline"
           />
           {/* Cinematic gradient overlay - diagonal sweep */}
           <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/50 to-transparent" />
@@ -332,7 +334,7 @@ const HomeV2 = () => {
       {/* ============================================================
           STATS / CREDIBILITY - ANIMATED COUNTERS
           ============================================================ */}
-      <section className="relative py-24 md:py-32 bg-neutral-950 dark:bg-neutral-950 overflow-hidden" data-testid="success-metrics" aria-label="Success metrics">
+      <section className="relative py-24 md:py-32 bg-neutral-950 dark:bg-neutral-950 overflow-hidden" data-testid="success-metrics">
         {/* Diagonal accent line */}
         <div
           className="absolute top-0 left-0 w-full h-[1px]"
@@ -482,7 +484,6 @@ const HomeV2 = () => {
       <section
         id="featured-section"
         className="relative py-24 md:py-32 bg-white dark:bg-neutral-950"
-        aria-label="Featured properties"
       >
         {/* Diagonal accent */}
         <div
@@ -532,7 +533,7 @@ const HomeV2 = () => {
       {/* ============================================================
           EDITORIAL SPLIT - BRAND STORY
           ============================================================ */}
-      <section className="relative overflow-hidden" aria-label="Our approach">
+      <section className="relative overflow-hidden">
         <div className="grid lg:grid-cols-2 min-h-[600px]">
           {/* Image side */}
           <RevealSection className="relative overflow-hidden">
@@ -560,14 +561,14 @@ const HomeV2 = () => {
               <div
                 className="inline-block px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs tracking-[0.2em] uppercase font-body"
               >
-                <MapPin className="w-3 h-3 inline mr-2" />
+                <MapPin className="w-3 h-3 inline mr-2" aria-hidden="true" />
                 Manhattan, NYC
               </div>
             </motion.div>
           </RevealSection>
 
           {/* Content side */}
-          <div className="bg-neutral-950 flex items-center p-10 md:p-16 lg:p-20">
+          <div className="bg-neutral-950 flex items-center p-6 sm:p-10 md:p-16 lg:p-20">
             <RevealSection delay={0.2}>
               <div
                 className="text-xs tracking-[0.4em] uppercase text-accent mb-6 font-body"
@@ -605,7 +606,7 @@ const HomeV2 = () => {
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
                   >
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 flex-shrink-0" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 flex-shrink-0" aria-hidden="true" />
                     <span>{item}</span>
                   </motion.div>
                 ))}
@@ -628,7 +629,7 @@ const HomeV2 = () => {
       {/* ============================================================
           AGENT SPOTLIGHT - CREATIVE CARDS
           ============================================================ */}
-      <section className="relative py-24 md:py-32 bg-white dark:bg-neutral-950 overflow-hidden" aria-label="Our team">
+      <section className="relative py-24 md:py-32 bg-white dark:bg-neutral-950 overflow-hidden">
         {/* Background accent */}
         <div
           className="absolute top-0 left-0 w-1/2 h-full opacity-[0.015] dark:opacity-[0.03]"
@@ -638,7 +639,7 @@ const HomeV2 = () => {
         />
 
         <div className="executive-container relative z-10">
-          <div className="grid lg:grid-cols-[1fr_1.5fr] gap-16 items-start">
+          <div className="grid lg:grid-cols-[1fr_1.5fr] gap-8 lg:gap-16 items-start">
             {/* Left column - header */}
             <RevealSection className="lg:sticky lg:top-32">
               <div
@@ -703,7 +704,7 @@ const HomeV2 = () => {
                   >
                     <img
                       src={agent.image}
-                      alt={agent.name}
+                      alt={`${agent.name}, ${agent.title}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                     {/* Hover reveal overlay */}
@@ -712,7 +713,7 @@ const HomeV2 = () => {
                     {/* Content - slides up on hover */}
                     <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                       <div
-                        className="text-xs tracking-[0.3em] uppercase mb-2 font-body text-accent"
+                        className="text-xs tracking-[0.3em] uppercase mb-2 text-accent font-body"
                       >
                         {agent.speciality}
                       </div>
@@ -754,7 +755,10 @@ const HomeV2 = () => {
       {/* ============================================================
           MARKET TICKER - HORIZONTAL SCROLL MARQUEE
           ============================================================ */}
-      <section className="relative py-6 bg-neutral-100 dark:bg-neutral-900 overflow-hidden border-y border-neutral-200 dark:border-neutral-800" aria-label="Market areas">
+      <section
+        className="relative py-6 bg-neutral-100 dark:bg-neutral-900 overflow-hidden border-y border-neutral-200 dark:border-neutral-800"
+        aria-label="Service areas and capabilities"
+      >
         <motion.div
           className="flex whitespace-nowrap gap-16"
           animate={{ x: ["0%", "-50%"] }}
@@ -775,12 +779,13 @@ const HomeV2 = () => {
                 "Advisory",
               ].map((text, i) => (
                 <span
-                  key={`${setIdx}-${i}`}
+                  key={`${setIdx}-${text}-${i}`}
                   className="text-sm tracking-[0.3em] uppercase text-neutral-400 dark:text-neutral-600 flex items-center gap-4 font-body"
                 >
                   {text}
                   <span
                     className="w-1.5 h-1.5 rounded-full bg-accent"
+                    aria-hidden="true"
                   />
                 </span>
               ))}
@@ -792,7 +797,7 @@ const HomeV2 = () => {
       {/* ============================================================
           CTA SECTION - VISUALLY STRIKING
           ============================================================ */}
-      <section className="relative py-32 md:py-44 overflow-hidden" aria-label="Call to action">
+      <section className="relative py-32 md:py-44 overflow-hidden">
         {/* Dark background with brand gradient */}
         <div className="absolute inset-0 bg-neutral-950" />
         <div
@@ -825,6 +830,7 @@ const HomeV2 = () => {
         {/* Large decorative text behind */}
         <div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[20vw] font-bold text-white/[0.02] select-none pointer-events-none whitespace-nowrap font-display"
+          aria-hidden="true"
         >
           BRAVADO
         </div>

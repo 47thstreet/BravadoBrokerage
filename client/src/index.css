@@ -357,6 +357,98 @@
     outline-offset: 2px;
   }
 
+  /* ═══ Red Pipe Branding System ═══ */
+
+  /* Buttons: red pipe appears on left on hover */
+  .executive-button {
+    position: relative;
+  }
+  .executive-button::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 25%;
+    width: 3px;
+    height: 50%;
+    background: hsl(0, 100%, 45%);
+    border-radius: 2px;
+    transform: scaleY(0);
+    transition: transform 200ms ease;
+  }
+  .executive-button:hover::before {
+    transform: scaleY(1);
+  }
+
+  /* Cards: red pipe top-left accent on hover */
+  .executive-card {
+    position: relative;
+    overflow: hidden;
+  }
+  .executive-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 0;
+    background: hsl(0, 100%, 45%);
+    transition: height 300ms ease;
+    z-index: 1;
+  }
+  .executive-card:hover::before {
+    height: 100%;
+  }
+
+  /* Links: red pipe underline effect */
+  .pipe-link {
+    position: relative;
+    display: inline-block;
+  }
+  .pipe-link::after {
+    content: '|';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: hsl(0, 100%, 45%);
+    font-weight: 300;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  .pipe-link:hover::after {
+    opacity: 1;
+  }
+
+  /* Section divider with pipe */
+  .pipe-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .pipe-divider::before,
+  .pipe-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: hsl(var(--border));
+  }
+
+  /* Badge with pipe accent */
+  .executive-badge {
+    position: relative;
+    padding-left: 12px;
+  }
+  .executive-badge::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 15%;
+    width: 3px;
+    height: 70%;
+    background: hsl(0, 100%, 45%);
+    border-radius: 2px;
+  }
+
   /* Elegant Legacy Classes */
   .bre-logo {
     font-family: var(--font-display);

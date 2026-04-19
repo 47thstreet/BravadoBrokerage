@@ -4,7 +4,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const { neon } = await import("@neondatabase/serverless");
     const { drizzle } = await import("drizzle-orm/neon-http");
-    const { properties } = await import("../shared/schema");
+    const { properties } = await import("./lib/schema");
 
     const queryClient = neon(process.env.DATABASE_URL!);
     const db = drizzle(queryClient);

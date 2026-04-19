@@ -10,6 +10,7 @@ import Home from "@/pages/Home";
 import HomeV2 from "@/pages/HomeV2";
 import HomeV3 from "@/pages/HomeV3";
 import HomeV4 from "@/pages/HomeV4";
+import HomeV5 from "@/pages/HomeV5";
 import About from "@/pages/About";
 import Agents from "@/pages/Agents";
 import Services from "@/pages/Services";
@@ -33,7 +34,7 @@ import AgentDetail from "@/pages/AgentDetail";
 import SetupPassword from "@/pages/SetupPassword";
 import { VersionProvider, useVersion } from "@/lib/versionContext";
 
-const HOME_VERSIONS = { v1: Home, v2: HomeV2, v3: HomeV3, v4: HomeV4 } as const;
+const HOME_VERSIONS = { v1: Home, v2: HomeV2, v3: HomeV3, v4: HomeV4, v5: HomeV5 } as const;
 
 function VersionedHome() {
   const { version } = useVersion();

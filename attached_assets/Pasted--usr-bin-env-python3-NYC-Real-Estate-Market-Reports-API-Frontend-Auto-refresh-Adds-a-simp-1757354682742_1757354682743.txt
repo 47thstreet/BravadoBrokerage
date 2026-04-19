@@ -1,0 +1,173 @@
+#!/usr/bin/env python3
+"""
+NYC Real Estate Market Reports API + Frontend (Auto-refresh)
+
+Adds a simple HTML/JS frontend served at `/` that lists the reports
+from the API, auto-refreshes every 60 seconds, and provides links
+to download PDFs.
+
+Run:
+python3 api.py --out ./data --port 5000
+
+Visit:
+http://localhost:5000/
+"""
+from __future__ import annotations
+
+import argparse
+import os
+import sqlite3
+import threading
+import uuid
+from flask import Flask, jsonify, request, send_from_directory, abort, render_template_string
+
+# Import scraper internals
+from nyc_market_reports_scraper import run as run_scraper
+
+app = Flask(__name__)
+
+CONFIG = {
+    "out_dir": "./data",
+    "max_per_source": 20,
+    "skip_downloads": False,
+    "only": None,
+    "since": None,
+    "fresh": False,
+}
+
+# ----------------------- Helpers -----------------------
+
+def get_db():
+    db_path = os.path.join(CONFIG["out_dir"], "reports.sqlite")
+    con = sqlite3.connect(db_path)
+    con.row_factory = sqlite3.Row
+    return con
+
+# ----------------------- API Routes -----------------------
+
+@app.route("/reports", methods=["GET"])
+def list_reports():
+    con = get_db()
+    cur = con.cursor()
+    q = "SELECT id, source_name, title, url, published, pdf_url, downloaded_path FROM reports ORDER BY created_at DESC"
+    cur.execute(q)
+    rows = [dict(r) for r in cur.fetchall()]
+    con.close()
+    return jsonify(rows)
+
+@app.route("/run", methods=["POST"])
+def trigger_scrape():
+    data = request.json or {}
+    only = data.get("only")
+    since = data.get("since")
+    fresh = bool(data.get("fresh", False))
+    skip_downloads = bool(data.get("skip_downloads", False))
+    max_per_source = int(data.get("max_per_source", CONFIG["max_per_source"]))
+
+    tid = str(uuid.uuid4())
+    def task():
+        run_scraper(
+            out_dir=CONFIG["out_dir"],
+            max_per_source=max_per_source,
+            skip_downloads=skip_downloads,
+            only=only.split(",") if only else None,
+            since=since,
+            fresh=fresh,
+        )
+    threading.Thread(target=task, daemon=True).start()
+    return jsonify({"status": "started", "task_id": tid})
+
+@app.route("/download/<rid>", methods=["GET"])
+def download_pdf(rid):
+    con = get_db()
+    cur = con.cursor()
+    cur.execute("SELECT downloaded_path FROM reports WHERE id=?", (rid,))
+    row = cur.fetchone()
+    con.close()
+    if not row or not row[0]:
+        abort(404)
+    path = row[0]
+    dirn, fn = os.path.split(path)
+    return send_from_directory(dirn, fn, as_attachment=True)
+
+# ----------------------- Frontend -----------------------
+
+INDEX_HTML = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NYC Market Reports</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    h1 { margin-bottom: 1rem; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+    th { background-color: #f5f5f5; }
+    a { color: #0066cc; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .small { font-size: 0.9em; color: #666; }
+    #status { margin: 1rem 0; color: green; }
+  </style>
+</head>
+<body>
+  <h1>NYC Real Estate Market Reports</h1>
+  <button onclick="runScrape()">Run Scraper</button>
+  <div id="status"></div>
+  <table id="reports">
+    <thead>
+      <tr><th>Source</th><th>Title</th><th>Date</th><th>Links</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function loadReports() {
+      const res = await fetch('/reports');
+      const data = await res.json();
+      const tbody = document.querySelector('#reports tbody');
+      tbody.innerHTML = '';
+      data.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${r.source_name}</td>
+          <td><a href="${r.url}" target="_blank">${r.title}</a></td>
+          <td>${r.published || ''}</td>
+          <td>
+            ${r.pdf_url ? `<a href="${r.pdf_url}" target="_blank">PDF (src)</a>` : ''}
+            ${r.downloaded_path ? ` | <a href="/download/${r.id}">Download</a>` : ''}
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function runScrape() {
+      document.getElementById('status').innerText = 'Scraping started...';
+      await fetch('/run', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({})});
+      setTimeout(()=>{ loadReports(); document.getElementById('status').innerText = 'Scraping complete (refreshing)'; }, 5000);
+    }
+
+    // Initial load
+    loadReports();
+    // Auto-refresh every 60 seconds
+    setInterval(loadReports, 60000);
+  </script>
+</body>
+</html>
+"""
+
+@app.route("/")
+def index():
+    return render_template_string(INDEX_HTML)
+
+# ----------------------- Main -----------------------
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description="NYC Market Reports API + Frontend (Auto-refresh)")
+    ap.add_argument("--out", default="./data", help="Output directory (default: ./data)")
+    ap.add_argument("--port", type=int, default=5000, help="Port to run the API")
+    args = ap.parse_args()
+
+    CONFIG["out_dir"] = args.out
+    os.makedirs(CONFIG["out_dir"], exist_ok=True)
+
+    app.run(host="0.0.0.0", port=args.port, debug=True)

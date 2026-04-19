@@ -1,0 +1,10 @@
+{
+  "buildCommand": "vite build",
+  "outputDirectory": "dist/public",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/objects/(.*)", "destination": "/api" },
+    { "source": "/public-objects/(.*)", "destination": "/api" }
+  ]
+}

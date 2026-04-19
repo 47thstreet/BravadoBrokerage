@@ -1,0 +1,646 @@
+Introduction
+Embed iFrame script code
+To implement the listing widget on your site, we recommend creating a container with 100% width (of the entire viewport). Some elements of the widget such as the split view, map view & listings details pages work & look best on full screens.
+
+The following code snippets provide you with various examples for integrating the RealtyMX IDX IFrame into your website.
+
+Please review the available parameters & option values provided and adjust the widget parameters for your requirements.
+
+You may add any of the supported parameters below on the script tag using the following format:
+
+data-parametername="value"
+
+A parameter should be defined no more then once per tag.
+
+ Paramaters List
+ 
+
+
+Common Example Code & Uses
+IDX frame with only rental listings
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-status="2"
+		data-client_id="1316"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+IDX frame with only sales listings (including In-Contract)
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-status="1,11"
+		data-client_id="1316"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+IDX frame with custom price range (Rentals, between $3,000-$5,000)
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-status="2"
+		data-maxPrice="5000"
+		data-client_id="1316"
+		data-minPrice="3000"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+IDX frame with custom sort order (Low Price, Largest Beds)
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-order="asc,desc"
+		data-status="2"
+		data-maxPrice="3500"
+		data-client_id="1316"
+		data-sort="price,beds"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+IDX frame with specific property type (Sales, Condos):
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-order="asc,desc"
+		data-status="1"
+		data-client_id="1316"
+		data-sort="price,beds"
+		data-type="Condo"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+IDX frame with specific amenities (Pool, Doorman, New Development):
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-order="asc,desc"
+		data-status="1"
+		data-client_id="1316"
+		data-sort="price,beds"
+		data-amenities="Pool,Doorman,NewDevelopment,NewConstruction"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+ Amenities List
+IDX Frame - With Split View
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-order="asc,desc"
+		data-status="1"
+		data-client_id="1316"
+		data-sort="price,beds"
+		data-page="browser"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+IDX frame - Grid View (sales):
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-order="asc,desc"
+		data-status="1"
+		data-client_id="1316"
+		data-sort="price,beds"
+		data-page="properties"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+IDX frame - Map View (sales):
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-order="asc,desc"
+		data-status="1"
+		data-client_id="1316"
+		data-sort="price,beds"
+		data-isMap="1"
+		data-page="properties"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+IDX frame - List View (sales):
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-order="asc,desc"
+		data-status="1"
+		data-client_id="1316"
+		data-sort="price,beds"
+		data-page="properties"
+		data-isList="1"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+IDX frame for specific neighborhood (Rentals, Upper West Side)
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-order="asc,desc"
+		data-status="2,21"
+		data-client_id="1316"
+		data-cat="14"
+		data-sort="price,beds"
+		data-page="properties"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+IDX frame with virtual tour (Rentals)
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-order="asc,desc"
+		data-status="2,21"
+		data-client_id="1316"
+		data-virtualTour="1"
+		data-sort="price,beds"
+		data-page="properties"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+IDX frame - Listing Detail Page:
+Set data-id="#" to an actual listing id such as data-id="1275".
+
+ Preview
+
+	<div id="realtymx_idx">
+		<script data-client_id="1316"  
+			data-page="details" 
+			data-id="1275" 
+			src="https://idx.realtymx.com/widget/idx.js">
+		</script>
+	</div>
+IDX frame - RLS Listing Detail Page:
+Set data-id="#" to an actual listing id such as data-id="1377720".
+
+ Preview
+
+	<div id="realtymx_idx">
+		<script data-client_id="1316"  
+			data-page="details" 
+			data-id="1377720" 
+			data-isMLS="1"  
+			src="https://idx.realtymx.com/widget/idx.js">
+		</script>
+	</div>
+IDX frame - Featured Listings widget:
+Set data-page="featured".
+
+ Preview
+
+		<div id="realtymx_idx">
+		<script data-client_id="1316"
+			data-page="featured" 
+			data-featuredSectionTitleShow="True"
+			data-featuredGridStatus="1,2"
+			dat-featuredGridCount="12"
+			src="https://idx.realtymx.com/widget/idx.js">
+		</script>
+		</div>
+ 
+
+
+Languages
+We've included native multi language support for the major elements (search, search results, listings details). The translated dictionary is still being updated. If you find any mistakes or have suggestions for specific words or phrases, then please let us know.
+
+We currently support Japanese (JP), Chinese (CH) & Korean (KR).
+
+Set data-lang to a language code such as data-lang="jp".
+
+IDX frame - List View (sales) - Japanese:
+ Preview
+<div id="realtymx_idx">
+	<script 
+		data-status="1"
+		data-client_id="1316"
+		data-lang="jp"
+		data-isList="1"
+		src="https://idx.realtymx.com/widget/idx.js">
+	</script>
+</div>
+ 
+
+
+URL Access Guide
+Accessing Listings Directly via your URL
+The following instructions allow you to access listing or create direct links to pages within the iframe using the page on your domain name that contains the IFRAME widget.
+
+Display your Search Landing Page
+yourdomain.com/your-listings-page/#listings - Directs the IFRAME to your Default search landing page.
+
+Display A Company Listing
+yourdomain.com/your-listings-page/#listing-LISTINGID - Directs the IFRAME to a Company listing details page.
+
+Invoke The Login Pop-Up
+yourdomain.com/your-listings-page/#login - open the pop-up modal window
+
+Invoke The Sign-Up Pop-Up
+yourdomain.com/your-listings-page/#signup - open the pop-up modal window
+
+ 
+
+
+Parameters & Values
+client_id Required
+Client ID number. (Provided by RealtyMX)
+idx_agent_id Optional
+Lock the IFRAME to a specific Agent. numeric. This value is provided by RealtyMX.
+agentID Optional
+Display the listings of a specific Agent. numeric. This value is provided by RealtyMX.
+status Required
+Listing status ID. Multiple values (separated by commas) are allowed.
+View allowed
+cat Optional
+Neighborhood ID number. Multiple values (separated by commas) are allowed. See option values reference table.
+minPrice Optional
+Minimum price range, numeric, (e.g.: minPrice=2000)
+maxPrice Optional
+Maximum price range,, numeric, (e.g.: maxPrice=5000)
+minBeds Optional
+Minimum bedrooms, numeric, (e.g.: minBeds=1)
+maxBeds Optional
+Maximum bedrooms, numeric, (e.g.: maxBeds=4)
+minBaths Optional
+Minimum bathrooms, numeric, (e.g.: minBaths=1)
+maxBaths Optional
+Max bathrooms, numeric, (e.g.: maxBaths=2.5)
+minFloor Optional
+Minimum Floor, numeric, (e.g.: minFloor=1)
+maxFloor Optional
+Max Floor, numeric, (e.g.: maxFloor=101)
+maxExpense Optional
+Maximum expenses, numeric, (e.g.: maxExpense=2500)
+Notes:
+Condo Types: maxExpense <= (Taxes + Common Charges)
+Co-Op Types: maxExpense <= Maintenance
+excludeAds Optional
+Exclude Company Ad Listings, boolean, (e.g.: excludeAds=True)
+page Optional
+Layout options.
+properties - Default Searches (isGrid, isList, isMap)
+browser - Split View Search
+details - Listing Details (ID required)
+id *Required for page=details
+The listing Web ID## to display.
+isGrid Optional
+Display the search results in a grid format (Default option). Requires page=properties. Set value to 1 (isGrid=1) to use.
+isList Optional
+Display the search results in a list format. Requires page=properties. Set value to 1 (isList=1) to use it.
+isMap Optional
+Display the search results in a map format. Requires page=properties. Set value to 1 (isMap=1) to use it.
+maxResults Optional
+Number of results to display per page. Value ranges 1 to 36 (max).
+minUI Optional
+True/False value to disable full Frame UI / Menu (search bar). Default false.
+minUIOptions Optional
+True/False value to disable sorting, serach result views and login options. Default false.
+buildingID Optional
+Show all listings from a Building. Value is the numeric building ID (*Company).
+rlsBuildingID Optional
+Show all listings from an IDX/RLS Building. Value is the numeric rls/mls building ID (*IDX).
+pets Optional
+Pet policy. See Pet Policy reference table for accepted values.
+Multiple values (separated by commas) are allowed.
+isCompanyListings Optional
+Display the company listings (Default option). Set value to 1 (isCompanyListings=1) to use it.
+isResidential Optional
+Display Residential Property Type Listings. Set value to 1 (isResidential=1) to use it.
+isCommercial Optional
+Display Commercial Property Type Listings. Set value to 1 (isCommercial=1) to use it.
+isFeatured Optional
+Display Featured Property Listings. Set value to 1 (isFeatured=1) to use it.
+OpenHouseChecked Optional
+Display listings with open house. Set value to 1 (OpenHouseChecked=1) to use it.
+type Optional
+Property type. Multiple values (separated by commas) are allowed. Accepted values are:
+Residential Types:
+Condo
+Coop
+House
+Townhouse
+Commercial Types:
+commercial
+retail
+office
+building
+land
+investment
+mixed use
+sort Optional
+Sort by Field(s). Accepted values are:
+price
+beds
+date_listed
+Multiple values (separated by commas) are allowed.
+order Optional
+Order for Sort Field(s) . Accepted values are:
+asc
+desc
+Multiple values (separated by commas) are allowed.
+custom-fieldname Optional
+In special cases, you can specify custom fields and values to be passed along to the RealtyMX system when loading the iframe.
+Please contact support@realtymx.com regarding your custom field needs.
+
+
+Use Example: data-custom-lang="en"
+
+Please mote that you should specify a particular custom field's value only once per iframe tag, however multiple unique data-custom-[fieldname]=value attributes are allowed.
+
+featuredSectionTitleShow Optional Featured
+True or False to display "Featured Listings" as title above the featured listing slider.
+featuredGridStatus Optional Featured
+Listing status ID. Multiple values (separated by commas) are allowed. Default as 1 (sale) and 2 (rental).
+featuredGridCount Optional Featured
+Number of featured listing count to bring to the featured listing section. Default as 12.
+ 
+
+
+Data Table & Option Reference Values
+status Required
+Listing status ID. Multiple values (separated by commas) are allowed.
+Status	Value
+0	Suspend
+1	For Sale
+11	In Contract
+12	Offer In
+19	Sold
+2	For Rent
+21	App. Pending
+22	Rented
+amenities optional
+Amenities Filter. Multiple values separated by commas are allowed: e.g. amenities=Pool,Garage,Doorman
+Amenity Key
+Doorman
+Elevator
+Laundry
+Pool
+OutdoorSpace
+LaundryInUnit
+NoFee
+PrivateOutdoorSpace
+NewDevelopment
+Furnished
+Renovated
+Dishwasher
+pets optional
+Pet Policy ID. Multiple values (separated by commas) are allowed.
+Pets	Value
+0	Unkown
+1	Cats Only
+2	Small Dogs
+3	Pets OK
+4	Dogs Only
+98	Case By Case
+99	No Pets
+Cat Optional
+Neighborhood ID. Multiple values (separated by commas) are allowed.
+Area	Cat_id
+Manhattan	23
+Battery Park City	25
+Chelsea	12
+Chinatown	73
+East Harlem	116
+East Village	9
+Financial District	16
+Flatiron	46
+Gramercy	4
+Greenwich Village	36
+Hamilton Heights	48
+Harlem	24
+Hudson Heights	70
+Inwood	50
+Kips Bay	35
+Little Italy	75
+Lower East Side	22
+Manhattan Valley	94
+Midtown East	6
+Midtown South	97
+Midtown West	13
+Hudson Yards	118
+Hudson Square	119
+Morningside Heights	43
+Murray Hill	8
+Nolita	93
+SoHo	2
+Stuyvesant Town	21
+Sutton Place	44
+Tribeca	1
+Union Square	20
+Upper East Side	7
+Upper West Side	14
+Washington Heights	33
+West Village	11
+Yorkville	63
+Roosevelt Island	58
+Area	Cat_id
+Brooklyn	121
+Bath Beach	122
+Bay Ridge	123
+Bedford Stuyvesant	124
+Bensonhurst	125
+Bergen Beach	126
+Boerum Hill	127
+Borough Park	128
+Brighton Beach	129
+Brooklyn Heights	130
+Brownsville	131
+Bushwick	132
+Canarsie	133
+Carroll Gardens	134
+Clinton Hill	135
+Cobble Hill	136
+Columbia St Waterfront District	137
+Coney Island	138
+Crown Heights	139
+Ditmas Park	140
+Downtown Brooklyn	141
+Dumbo	142
+Dyker Heights	143
+East New York	144
+Flatbush	145
+Flatlands	146
+Fort Greene	147
+Gerritsen Beach	148
+Gowanus	149
+Gravesend	150
+Greenpoint	151
+Greenwood	152
+Kensington	153
+Manhattan Beach	154
+Mapleton	155
+Marine Park	156
+Midwood	157
+Mill Basin	158
+Park Slope	159
+Prospect Heights	160
+Prospect Park South	161
+Prospect Lefferts Gardens	162
+Red Hook	163
+Seagate	164
+Sheepshead Bay	165
+Sunset Park	166
+Williamsburg	167
+Windsor Terrace	168
+Starrett City	169
+Ocean Parkway	170
+Northeast Flatbush	171
+Old Mill Basin	172
+Ocean Hill	173
+Area	Cat_id
+Queens	174
+Alley Park	175
+Astoria	176
+Auburndale	177
+Bay Terrace	178
+Bayside	179
+Bellerose	180
+Briarwood	181
+Brookville	182
+Cambria Heights	183
+Clearview	184
+College Point	185
+Corona	186
+Douglaston	187
+East Elmhurst	188
+Elmhurst	189
+Floral Park	190
+Flushing	191
+Forest Hills	192
+Fresh Meadows	193
+Glen Oaks Village	194
+Glendale	195
+Hillcrest	196
+Hollis	197
+Howard Beach	198
+Jackson Heights	199
+Jamaica	200
+Jamaica Estates	201
+Jamaica Hills	202
+Kew Gardens	203
+Kew Gardens Hills	204
+Laurelton	205
+Little Neck	206
+Long Island City	207
+Maspeth	208
+Middle Village	209
+North Corona	210
+Oakland Gardens	211
+Ozone Park	212
+Pomonok	213
+Queens Village	214
+Rego Park	215
+Richmond Hill	216
+Ridgewood	217
+Rosedale	218
+St. Albans	219
+South Jamaica	220
+South Ozone Park	221
+Springfield Gardens	222
+Sunnyside	223
+Utopia	224
+Whitestone	225
+Woodhaven	226
+Woodside	227
+The Rockaways	228
+Ditmars-Steinway	229
+New Hyde Park	230
+South Richmond Hill	231
+Rockaway All	232
+ 
+
+
+Quicksearch Widget
+Add a stand-alone IDX "quicksearch" widget to your home page or landing pages that can search and load the IDX listing results on your site.
+
+Requirements:
+Source Element Container ID
+sourceID Required - valid DOM element ID selector to put the search box in.
+
+Target URL OR Container ID Require One
+targetID - Enter a element ID selector on the current page to load the IFRAME within.
+targetURL - Enter a valid URL for your IFrame's search page (e.g. https://yourdomain.com/your-listings-page).
+
+ Live Preview Example
+Target Page Example:
+
+This example will allow you to add this widget to one page, and allow you to target another URL on your domain to render the results.
+
+
+    <script data-client_id="1462" 
+        data-page="quicksearch" 
+        data-sourceID='realtymx_idx1' 
+        data-targetURL="https://idx.realtymx.com/widget/target.cfm"
+        src="https://idx.realtymx.com/widget/idx_qsearch.js">
+    </script>
+    <div id="realtymx_idx1"></div>
+    
+Element ID Usage Example:
+This example will allow you to add both this quicksearch widget and a destination container ID to render the full IDX IFrame on the same page.
+
+
+    <script data-client_id="1462" 
+        data-page="quicksearch" 
+        data-sourceID='realtymx_idx1' 
+        data-targetID="realtymx_idx2"
+        src="https://idx.realtymx.com/widget/idx_qsearch.js">
+    </script>
+    <div id="realtymx_idx1"></div>
+    <div id="realtymx_idx2"></div>
+    
+Styling
+What is shown below is the base html code structure and css stylesheet returned by the widget and rendered on your page.
+
+You should place any style adjusting overrides you need into your including page's CSS stylesheets in order to adjust the returned widgets appearance to mactch your site theme as needed.
+
+
+    
+        /* class for quick search form */
+        form.site-search {
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+            justify-items: center;
+            justify-content: center;
+            align-content: center;
+            margin-block-end: 0;
+            margin-bottom: 0;
+            margin-top: 0;
+            margin-block-start: 0;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            z-index: 1780;
+        }
+        /* text input class */
+        form.site-search .ui-autocomplete-input {
+            border-top-left-radius: 30px;
+            border-bottom-left-radius: 30px;
+            width: 600px;
+        }
+                
+        /* quick search button */
+        form.site-search .btn{
+            background-color: white;
+            border-top-right-radius: 30px;
+            border-bottom-right-radius: 30px;
+            padding: 10px 19px;
+            height: 44px;
+        }
+
+
+        .ui-autocomplete.ui-menu.ui-widget {
+            z-index: 1781!important;
+        }
+
+
+
+    
+    <form class="site-search" id="webIDForm">
+        <button type="submit" class="btn">
+            <i class="fa fa-search"></i>
+            <i class="fa fa-spinner fa-spin" style="display: none;"></i>
+        </button>
+		<input type="text" class="search-query ui-autocomplete-input" id="thisVal"/>
+    </form>
+    

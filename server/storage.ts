@@ -1,24 +1,14 @@
 import { type Property, type InsertProperty, type Agent, type InsertAgent, type Inquiry, type InsertInquiry, type MarketReport, type InsertMarketReport, type Subscription, type InsertSubscription, type User, type InsertUser, type PasswordSetupToken, type InsertPasswordSetupToken, properties, agents, inquiries, marketReports, subscriptions, users, passwordSetupTokens } from "@shared/schema";
-import { drizzle } from "drizzle-orm/neon-serverless";
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
 import { eq, and, gte, lte, sql, desc } from "drizzle-orm";
-import { Pool, neonConfig } from "@neondatabase/serverless";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is required but not set");
 }
 
-// Configure WebSocket - use native fetch for serverless, ws for Node.js
-if (typeof globalThis.WebSocket === 'undefined') {
-  try {
-    const ws = await import("ws");
-    neonConfig.webSocketConstructor = ws.default;
-  } catch {
-    // In serverless environments without ws, Neon uses fetch fallback
-  }
-}
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const db = drizzle(pool);
+const queryClient = neon(process.env.DATABASE_URL);
+const db = drizzle(queryClient);
 
 export interface IStorage {
   // Properties

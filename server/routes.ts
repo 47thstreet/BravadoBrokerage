@@ -4,8 +4,20 @@ import { storage } from "./storage";
 import { insertPropertySchema, insertAgentSchema, insertInquirySchema, insertMarketReportSchema, insertSubscriptionSchema } from "@shared/schema";
 import { z } from "zod";
 import { isAuthenticated, isAdmin, isAdminOrAgent, hashPassword, verifyPassword, generateSetupToken } from "./auth";
-import { ObjectStorageService, ObjectNotFoundError } from "./objectStorage";
-import { ObjectPermission } from "./objectAcl";
+
+// Object storage is Replit-specific; gracefully handle missing deps
+let ObjectStorageService: any = null;
+let ObjectNotFoundError: any = null;
+let ObjectPermission: any = null;
+try {
+  const objStorage = await import("./objectStorage");
+  ObjectStorageService = objStorage.ObjectStorageService;
+  ObjectNotFoundError = objStorage.ObjectNotFoundError;
+  const objAcl = await import("./objectAcl");
+  ObjectPermission = objAcl.ObjectPermission;
+} catch {
+  // Object storage not available in this environment
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
@@ -367,23 +379,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/agents", async (req, res) => {
     try {
       const agents = await storage.getAgents();
-      const objectStorage = new ObjectStorageService();
-      
+
       const agentsWithImageUrls = await Promise.all(
         agents.map(async (agent) => {
-          if (agent.image && agent.image.startsWith('objects/')) {
+          if (agent.image && agent.image.startsWith('objects/') && ObjectStorageService) {
             try {
+              const objectStorage = new ObjectStorageService();
               const imageUrl = await objectStorage.getSignedViewURL(agent.image);
               return { ...agent, imageUrl };
             } catch (err) {
-              console.error(`Failed to get signed URL for agent ${agent.id}:`, err);
               return { ...agent, imageUrl: null };
             }
           }
           return { ...agent, imageUrl: agent.image || null };
         })
       );
-      
+
       res.json(agentsWithImageUrls);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch agents" });
@@ -397,17 +408,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Agent not found" });
       }
       
-      const objectStorage = new ObjectStorageService();
       let imageUrl = agent.image || null;
-      
-      if (agent.image && agent.image.startsWith('objects/')) {
+
+      if (agent.image && agent.image.startsWith('objects/') && ObjectStorageService) {
         try {
+          const objectStorage = new ObjectStorageService();
           imageUrl = await objectStorage.getSignedViewURL(agent.image);
         } catch (err) {
-          console.error(`Failed to get signed URL for agent ${agent.id}:`, err);
+          // Object storage not available
         }
       }
-      
+
       res.json({ ...agent, imageUrl });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch agent" });
@@ -607,8 +618,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Object Storage routes
+  // Object Storage routes (require Replit object storage)
   app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
+    if (!ObjectStorageService) return res.status(501).json({ error: "Object storage not configured" });
     try {
       const objectStorageService = new ObjectStorageService();
       const { uploadURL, objectPath } = await objectStorageService.getObjectEntityUploadURL();
@@ -620,6 +632,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/objects/get-url", isAuthenticated, async (req, res) => {
+    if (!ObjectStorageService) return res.status(501).json({ error: "Object storage not configured" });
     try {
       const { objectPath } = req.body;
       if (!objectPath) {
@@ -637,6 +650,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
   app.get("/objects/:objectPath(*)", isAuthenticated, async (req, res) => {
+    if (!ObjectStorageService) return res.status(501).json({ error: "Object storage not configured" });
     const userId = req.session.userId;
     const objectStorageService = new ObjectStorageService();
     try {
@@ -662,6 +676,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/public-objects/:filePath(*)", async (req, res) => {
+    if (!ObjectStorageService) return res.status(501).json({ error: "Object storage not configured" });
     const filePath = req.params.filePath;
     const objectStorageService = new ObjectStorageService();
     try {
@@ -677,6 +692,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.put("/api/agent-images", isAuthenticated, async (req, res) => {
+    if (!ObjectStorageService) return res.status(501).json({ error: "Object storage not configured" });
     if (!req.body.imageURL || !req.body.agentId) {
       return res.status(400).json({ error: "imageURL and agentId are required" });
     }
@@ -705,6 +721,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.put("/api/property-images", isAuthenticated, async (req, res) => {
+    if (!ObjectStorageService) return res.status(501).json({ error: "Object storage not configured" });
     if (!req.body.imageURLs || !req.body.propertyId) {
       return res.status(400).json({ error: "imageURLs and propertyId are required" });
     }

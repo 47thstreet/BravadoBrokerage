@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Shield, Clock, ArrowRight, CheckCircle, Phone } from "lucide-react";
+import { FileText, Shield, Clock, ArrowRight, CheckCircle, Phone, MessageCircleQuestion } from "lucide-react";
 import { Link } from "wouter";
 
 const scrollToTop = () => {
@@ -8,6 +8,8 @@ const scrollToTop = () => {
 };
 
 const ApplyNow = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     // Embedder script for iframe auto-resize
     const style = document.createElement('style');
@@ -136,16 +138,53 @@ const ApplyNow = () => {
               </div>
             </div>
 
-            <iframe
-              id="application_frame"
-              width="100%"
-              frameBorder="0"
-              src="https://bravado.quickleasepro.com/properties/106242/apply?iframe=true&embed_session=true"
-              data-testid="application-frame"
-              title="Bravado Tenant Application"
-              className="min-h-[600px] bg-white"
-              style={{ display: "block" }}
-            />
+            {/* Iframe container with inner shadow */}
+            <div className="relative" style={{ boxShadow: "inset 0 2px 8px rgba(0,0,0,0.08), inset 0 0 2px rgba(0,0,0,0.04)" }}>
+              {/* Loading skeleton */}
+              {isLoading && (
+                <div className="absolute inset-0 z-10 bg-white flex flex-col items-center justify-center min-h-[600px]">
+                  <div className="w-full max-w-lg px-8 space-y-6">
+                    {/* Simulated form skeleton */}
+                    <div className="space-y-4">
+                      <div className="h-8 bg-neutral-200 rounded-md w-3/4 animate-pulse" />
+                      <div className="h-4 bg-neutral-100 rounded w-1/2 animate-pulse" />
+                    </div>
+                    <div className="space-y-3">
+                      <div className="h-10 bg-neutral-100 rounded-md animate-pulse" />
+                      <div className="h-10 bg-neutral-100 rounded-md animate-pulse" style={{ animationDelay: "150ms" }} />
+                      <div className="h-10 bg-neutral-100 rounded-md animate-pulse" style={{ animationDelay: "300ms" }} />
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="h-10 bg-neutral-100 rounded-md flex-1 animate-pulse" style={{ animationDelay: "450ms" }} />
+                      <div className="h-10 bg-neutral-100 rounded-md flex-1 animate-pulse" style={{ animationDelay: "600ms" }} />
+                    </div>
+                    <div className="h-10 bg-neutral-200 rounded-md w-1/3 animate-pulse" style={{ animationDelay: "750ms" }} />
+                  </div>
+                  <p className="mt-8 text-sm text-neutral-400 tracking-wide">Loading application portal...</p>
+                </div>
+              )}
+
+              <iframe
+                id="application_frame"
+                width="100%"
+                frameBorder="0"
+                src="https://bravado.quickleasepro.com/properties/106242/apply?iframe=true&embed_session=true"
+                data-testid="application-frame"
+                title="Bravado Tenant Application"
+                className="min-h-[600px] bg-white"
+                style={{ display: "block" }}
+                onLoad={() => setIsLoading(false)}
+              />
+            </div>
+
+            {/* Branded footer */}
+            <div className="bg-neutral-50 dark:bg-neutral-900 border-t border-neutral-200 dark:border-neutral-800 px-6 py-3 flex items-center justify-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
+              <span className="font-medium">Bravado Real Estate</span>
+              <span className="text-neutral-300 dark:text-neutral-600">|</span>
+              <span>Secure Tenant Portal</span>
+              <span className="text-neutral-300 dark:text-neutral-600">|</span>
+              <a href="tel:+12125550123" className="hover:text-accent transition-colors">(212) 555-0123</a>
+            </div>
           </div>
 
           {/* Help Section */}
@@ -195,6 +234,16 @@ const ApplyNow = () => {
           </div>
         </div>
       </section>
+      {/* Floating help button */}
+      <Link href="/contact" onClick={() => scrollToTop()}>
+        <button
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 px-4 py-2.5 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 text-sm font-medium"
+          aria-label="Need help? Contact us"
+        >
+          <MessageCircleQuestion className="w-4 h-4" />
+          Need help?
+        </button>
+      </Link>
     </div>
   );
 };

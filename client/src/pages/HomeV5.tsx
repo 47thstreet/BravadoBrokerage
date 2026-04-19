@@ -1,8 +1,12 @@
 import { Link } from "wouter";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Phone, Mail, MapPin, ChevronDown } from "lucide-react";
 import PropertyGrid from "@/components/PropertyGrid";
+import type { Agent } from "@shared/schema";
+
+type AgentWithImageUrl = Agent & { imageUrl?: string | null };
 
 /*
  * V5 — "The Pipe"
@@ -15,7 +19,7 @@ import PropertyGrid from "@/components/PropertyGrid";
  * and connects the bold promise (B) to the craft (RE).
  *
  * Color: near-black backgrounds, white type, red pipe accents only.
- * Typography: Playfair Display display, Inter body. Nothing else.
+ * Typography: Bodoni Moda display, Inter body. Nothing else.
  * Motion: purposeful reveals. Nothing gratuitous.
  * Layout: vertical rhythm. Columns divided by pipes.
  */
@@ -56,6 +60,61 @@ const fadeUp = {
   })
 };
 
+// Team section — fetches agents from the API
+const TeamSection = ({ scrollToTop }: { scrollToTop: () => void }) => {
+  const { data: agents } = useQuery<AgentWithImageUrl[]>({
+    queryKey: ["/api/agents"],
+  });
+
+  const displayAgents = agents?.slice(0, 3) ?? [];
+
+  return (
+    <section className="py-24">
+      <div className="executive-container">
+        <div className="flex items-center gap-4 mb-16">
+          <Pipe height="h-6" />
+          <span className="text-xs uppercase tracking-[0.2em] text-neutral-500">Our Team</span>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {displayAgents.length === 0
+            ? [...Array(3)].map((_, i) => (
+                <div key={i} className="bg-neutral-900 rounded-sm p-8 animate-pulse">
+                  <div className="h-6 bg-neutral-800 rounded w-2/3 mb-3" />
+                  <div className="h-4 bg-neutral-800 rounded w-1/2" />
+                </div>
+              ))
+            : displayAgents.map((agent, i) => (
+                <motion.div
+                  key={agent.id}
+                  initial="hidden"
+                  whileInView="visible"
+                  custom={i}
+                  variants={fadeUp}
+                  viewport={{ once: true }}
+                >
+                  <Link href={`/agents/${agent.id}`} onClick={scrollToTop}>
+                    <div className="group relative bg-neutral-900 border border-neutral-800 rounded-sm p-8 hover:border-neutral-700 hover:bg-neutral-900/80 transition-all duration-300 cursor-pointer">
+                      {/* Pipe accent on hover */}
+                      <div
+                        className="absolute left-0 top-0 bottom-0 w-[2px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        style={{ background: PIPE }}
+                      />
+                      <h3 className="font-display text-xl text-white mb-1">{agent.name}</h3>
+                      <p className="text-sm text-neutral-500">{agent.title || "Real Estate Agent"}</p>
+                      <span className="inline-flex items-center gap-2 mt-6 text-xs uppercase tracking-wider text-neutral-600 group-hover:text-white transition-colors">
+                        View Profile <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const HomeV5 = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -84,6 +143,16 @@ const HomeV5 = () => {
             className="w-full h-full object-cover opacity-[0.07]"
           />
         </div>
+
+        {/* Noise/grain texture overlay */}
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none opacity-[0.035] mix-blend-overlay"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+            backgroundSize: "128px 128px",
+          }}
+        />
 
         {/* Center pipe — the hero's spine */}
         <div className="absolute left-1/2 top-0 bottom-0 w-[2px] -translate-x-1/2 hidden lg:block"
@@ -319,6 +388,59 @@ const HomeV5 = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════
+          TESTIMONIALS — Client voices. Pipe left-borders.
+          Minimal — no stars, no avatars, just words.
+          ═══════════════════════════════════════════════ */}
+      <section className="py-24 bg-neutral-900/50">
+        <div className="executive-container">
+          <div className="flex items-center gap-4 mb-16">
+            <Pipe height="h-6" />
+            <span className="text-xs uppercase tracking-[0.2em] text-neutral-500">Client Voices</span>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            {[
+              {
+                quote: "They saw value in our building that three other firms missed entirely. Closed at 18% above our ask.",
+                name: "David Chen",
+                role: "Managing Partner, Gramercy Capital",
+              },
+              {
+                quote: "No theatrics, no wasted showings. They understood what we needed and delivered in under 30 days.",
+                name: "Sarah Okonkwo",
+                role: "VP of Operations, Tribeca Hospitality Group",
+              },
+              {
+                quote: "The level of market intelligence they brought to our lease negotiation saved us seven figures. Period.",
+                name: "Michael Torres",
+                role: "CFO, Hudson Yards Ventures",
+              },
+            ].map((testimonial, i) => (
+              <motion.blockquote
+                key={testimonial.name}
+                className="relative pl-6"
+                initial="hidden" whileInView="visible" custom={i}
+                variants={fadeUp} viewport={{ once: true }}
+              >
+                {/* Pipe left-border */}
+                <div
+                  className="absolute left-0 top-0 bottom-0 w-[2px]"
+                  style={{ background: PIPE }}
+                />
+                <p className="text-neutral-300 text-base leading-relaxed italic mb-6">
+                  "{testimonial.quote}"
+                </p>
+                <footer>
+                  <div className="text-sm text-white font-medium">{testimonial.name}</div>
+                  <div className="text-xs text-neutral-600 mt-1">{testimonial.role}</div>
+                </footer>
+              </motion.blockquote>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════
           BRAND STATEMENT — Full-width. Just words.
           The pipe as punctuation.
           ═══════════════════════════════════════════════ */}
@@ -337,6 +459,12 @@ const HomeV5 = () => {
           </motion.h2>
         </div>
       </section>
+
+      {/* ═══════════════════════════════════════════════
+          OUR TEAM — Agent cards from the API.
+          Dark cards, subtle hover, pipe accents.
+          ═══════════════════════════════════════════════ */}
+      <TeamSection scrollToTop={scrollToTop} />
 
       {/* ═══════════════════════════════════════════════
           NEIGHBORHOODS — The boroughs we serve.
@@ -376,11 +504,41 @@ const HomeV5 = () => {
             initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8 }} viewport={{ once: true }}
           >
-            {/* Corner pipe accents */}
-            <div className="absolute top-0 left-0 w-[3px] h-12" style={{ background: PIPE }} />
-            <div className="absolute top-0 left-0 h-[3px] w-12" style={{ background: PIPE }} />
-            <div className="absolute bottom-0 right-0 w-[3px] h-12" style={{ background: PIPE }} />
-            <div className="absolute bottom-0 right-0 h-[3px] w-12" style={{ background: PIPE }} />
+            {/* Animated corner pipe accents — draw in from corners */}
+            {/* Top-left */}
+            <motion.div
+              className="absolute top-0 left-0 w-[3px] origin-top"
+              style={{ background: PIPE }}
+              initial={{ height: 0 }}
+              whileInView={{ height: 48 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              viewport={{ once: true }}
+            />
+            <motion.div
+              className="absolute top-0 left-0 h-[3px] origin-left"
+              style={{ background: PIPE }}
+              initial={{ width: 0 }}
+              whileInView={{ width: 48 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              viewport={{ once: true }}
+            />
+            {/* Bottom-right */}
+            <motion.div
+              className="absolute bottom-0 right-0 w-[3px] origin-bottom"
+              style={{ background: PIPE }}
+              initial={{ height: 0 }}
+              whileInView={{ height: 48 }}
+              transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              viewport={{ once: true }}
+            />
+            <motion.div
+              className="absolute bottom-0 right-0 h-[3px] origin-right"
+              style={{ background: PIPE }}
+              initial={{ width: 0 }}
+              whileInView={{ width: 48 }}
+              transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              viewport={{ once: true }}
+            />
 
             <h2 className="font-display text-display-md text-white mb-6">
               Ready to make<br /><span className="italic font-light">your move</span><span style={{ color: PIPE }}>?</span>

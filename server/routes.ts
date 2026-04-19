@@ -5,20 +5,6 @@ import { insertPropertySchema, insertAgentSchema, insertInquirySchema, insertMar
 import { z } from "zod";
 import { isAuthenticated, isAdmin, isAdminOrAgent, hashPassword, verifyPassword, generateSetupToken } from "./auth";
 
-// Object storage is Replit-specific; gracefully handle missing deps
-let ObjectStorageService: any = null;
-let ObjectNotFoundError: any = null;
-let ObjectPermission: any = null;
-try {
-  const objStorage = await import("./objectStorage");
-  ObjectStorageService = objStorage.ObjectStorageService;
-  ObjectNotFoundError = objStorage.ObjectNotFoundError;
-  const objAcl = await import("./objectAcl");
-  ObjectPermission = objAcl.ObjectPermission;
-} catch {
-  // Object storage not available in this environment
-}
-
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth routes
   app.post('/api/auth/login', async (req, res) => {
@@ -380,20 +366,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const agents = await storage.getAgents();
 
-      const agentsWithImageUrls = await Promise.all(
-        agents.map(async (agent) => {
-          if (agent.image && agent.image.startsWith('objects/') && ObjectStorageService) {
-            try {
-              const objectStorage = new ObjectStorageService();
-              const imageUrl = await objectStorage.getSignedViewURL(agent.image);
-              return { ...agent, imageUrl };
-            } catch (err) {
-              return { ...agent, imageUrl: null };
-            }
-          }
-          return { ...agent, imageUrl: agent.image || null };
-        })
-      );
+      const agentsWithImageUrls = agents.map((agent) => ({
+        ...agent,
+        imageUrl: agent.image || null,
+      }));
 
       res.json(agentsWithImageUrls);
     } catch (error) {
@@ -408,18 +384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Agent not found" });
       }
       
-      let imageUrl = agent.image || null;
-
-      if (agent.image && agent.image.startsWith('objects/') && ObjectStorageService) {
-        try {
-          const objectStorage = new ObjectStorageService();
-          imageUrl = await objectStorage.getSignedViewURL(agent.image);
-        } catch (err) {
-          // Object storage not available
-        }
-      }
-
-      res.json({ ...agent, imageUrl });
+      res.json({ ...agent, imageUrl: agent.image || null });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch agent" });
     }
@@ -618,141 +583,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Object Storage routes (require Replit object storage)
-  app.post("/api/objects/upload", isAuthenticated, async (req, res) => {
-    if (!ObjectStorageService) return res.status(501).json({ error: "Object storage not configured" });
-    try {
-      const objectStorageService = new ObjectStorageService();
-      const { uploadURL, objectPath } = await objectStorageService.getObjectEntityUploadURL();
-      res.json({ uploadURL, objectPath });
-    } catch (error) {
-      console.error("Error getting upload URL:", error);
-      res.status(500).json({ error: "Failed to get upload URL" });
-    }
-  });
-
-  app.post("/api/objects/get-url", isAuthenticated, async (req, res) => {
-    if (!ObjectStorageService) return res.status(501).json({ error: "Object storage not configured" });
-    try {
-      const { objectPath } = req.body;
-      if (!objectPath) {
-        return res.status(400).json({ error: "objectPath required" });
-      }
-      
-      const objectStorageService = new ObjectStorageService();
-      const viewURL = await objectStorageService.getSignedViewURL(objectPath);
-      res.json({ viewURL });
-    } catch (error) {
-      console.error("Error getting view URL:", error);
-      res.status(500).json({ error: "Failed to get view URL" });
-    }
-  });
-
-
-  app.get("/objects/:objectPath(*)", isAuthenticated, async (req, res) => {
-    if (!ObjectStorageService) return res.status(501).json({ error: "Object storage not configured" });
-    const userId = req.session.userId;
-    const objectStorageService = new ObjectStorageService();
-    try {
-      const objectFile = await objectStorageService.getObjectEntityFile(
-        req.path,
-      );
-      const canAccess = await objectStorageService.canAccessObjectEntity({
-        objectFile,
-        userId: userId,
-        requestedPermission: ObjectPermission.READ,
-      });
-      if (!canAccess) {
-        return res.sendStatus(401);
-      }
-      objectStorageService.downloadObject(objectFile, res);
-    } catch (error) {
-      console.error("Error checking object access:", error);
-      if (error instanceof ObjectNotFoundError) {
-        return res.sendStatus(404);
-      }
-      return res.sendStatus(500);
-    }
-  });
-
-  app.get("/public-objects/:filePath(*)", async (req, res) => {
-    if (!ObjectStorageService) return res.status(501).json({ error: "Object storage not configured" });
-    const filePath = req.params.filePath;
-    const objectStorageService = new ObjectStorageService();
-    try {
-      const file = await objectStorageService.searchPublicObject(filePath);
-      if (!file) {
-        return res.status(404).json({ error: "File not found" });
-      }
-      objectStorageService.downloadObject(file, res);
-    } catch (error) {
-      console.error("Error searching for public object:", error);
-      return res.status(500).json({ error: "Internal server error" });
-    }
-  });
-
-  app.put("/api/agent-images", isAuthenticated, async (req, res) => {
-    if (!ObjectStorageService) return res.status(501).json({ error: "Object storage not configured" });
-    if (!req.body.imageURL || !req.body.agentId) {
-      return res.status(400).json({ error: "imageURL and agentId are required" });
-    }
-
-    const userId = req.session.userId;
-
-    try {
-      const objectStorageService = new ObjectStorageService();
-      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
-        req.body.imageURL,
-        {
-          owner: userId!,
-          visibility: "public",
-        },
-      );
-
-      await storage.updateAgent(req.body.agentId, { image: objectPath });
-
-      res.status(200).json({
-        objectPath: objectPath,
-      });
-    } catch (error) {
-      console.error("Error setting agent image:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
-
-  app.put("/api/property-images", isAuthenticated, async (req, res) => {
-    if (!ObjectStorageService) return res.status(501).json({ error: "Object storage not configured" });
-    if (!req.body.imageURLs || !req.body.propertyId) {
-      return res.status(400).json({ error: "imageURLs and propertyId are required" });
-    }
-
-    const userId = req.session.userId;
-
-    try {
-      const objectStorageService = new ObjectStorageService();
-      const imagePaths: string[] = [];
-
-      for (const imageURL of req.body.imageURLs) {
-        const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
-          imageURL,
-          {
-            owner: userId!,
-            visibility: "public",
-          },
-        );
-        imagePaths.push(objectPath);
-      }
-
-      await storage.updateProperty(req.body.propertyId, { images: imagePaths });
-
-      res.status(200).json({
-        objectPaths: imagePaths,
-      });
-    } catch (error) {
-      console.error("Error setting property images:", error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
+  // Object Storage routes (stub — Replit object storage not available on Vercel)
+  const objectStorageStub = (_req: any, res: any) => res.status(501).json({ error: "Object storage not configured for this environment" });
+  app.post("/api/objects/upload", isAuthenticated, objectStorageStub);
+  app.post("/api/objects/get-url", isAuthenticated, objectStorageStub);
+  app.get("/objects/:objectPath(*)", isAuthenticated, objectStorageStub);
+  app.get("/public-objects/:filePath(*)", objectStorageStub);
+  app.put("/api/agent-images", isAuthenticated, objectStorageStub);
+  app.put("/api/property-images", isAuthenticated, objectStorageStub);
 
   const httpServer = createServer(app);
   return httpServer;

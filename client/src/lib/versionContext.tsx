@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 
-export type SiteVersion = "v1" | "v2" | "v3" | "v4" | "v5";
+export type SiteVersion = "v1" | "v2" | "v3" | "v4" | "v5" | "v6" | "v7";
 
 interface VersionContextType {
   version: SiteVersion;
@@ -8,12 +8,12 @@ interface VersionContextType {
 }
 
 const VersionContext = createContext<VersionContextType>({
-  version: "v5",
+  version: "v7",
   setVersion: () => {},
 });
 
 export function VersionProvider({ children }: { children: ReactNode }) {
-  const [version, setVersion] = useState<SiteVersion>("v5");
+  const [version, setVersion] = useState<SiteVersion>("v7");
   return (
     <VersionContext.Provider value={{ version, setVersion }}>
       {children}
@@ -31,4 +31,6 @@ export const VERSION_LABELS: Record<SiteVersion, string> = {
   v3: "v3",
   v4: "v4",
   v5: "v5",
+  v6: "v6",
+  v7: "v7",
 };

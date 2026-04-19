@@ -1,14 +1,26 @@
 import { type Property, type InsertProperty, type Agent, type InsertAgent, type Inquiry, type InsertInquiry, type MarketReport, type InsertMarketReport, type Subscription, type InsertSubscription, type User, type InsertUser, type PasswordSetupToken, type InsertPasswordSetupToken, properties, agents, inquiries, marketReports, subscriptions, users, passwordSetupTokens } from "../shared/schema";
-import { drizzle } from "drizzle-orm/neon-http";
+import { drizzle, type NeonHttpDatabase } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 import { eq, and, gte, lte, sql, desc } from "drizzle-orm";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL environment variable is required but not set");
+let _db: NeonHttpDatabase | null = null;
+
+function getDb(): NeonHttpDatabase {
+  if (!_db) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error("DATABASE_URL environment variable is required but not set");
+    }
+    const queryClient = neon(process.env.DATABASE_URL);
+    _db = drizzle(queryClient);
+  }
+  return _db;
 }
 
-const queryClient = neon(process.env.DATABASE_URL);
-const db = drizzle(queryClient);
+const db = new Proxy({} as NeonHttpDatabase, {
+  get(_target, prop) {
+    return (getDb() as any)[prop];
+  }
+});
 
 export interface IStorage {
   // Properties

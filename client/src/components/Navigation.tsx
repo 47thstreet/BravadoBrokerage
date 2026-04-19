@@ -2,11 +2,14 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useVersion, VERSION_LABELS, type SiteVersion } from "@/lib/versionContext";
 
 const Navigation = () => {
   const [location] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const { version, setVersion } = useVersion();
+  const [versionOpen, setVersionOpen] = useState(false);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -49,6 +52,34 @@ const Navigation = () => {
                 className="h-16 w-auto brightness-0 invert"
               />
             </Link>
+            {/* Version Switcher */}
+            <div className="relative"
+              onMouseEnter={() => setVersionOpen(true)}
+              onMouseLeave={() => setVersionOpen(false)}
+            >
+              <button className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-neutral-400 hover:text-white border border-neutral-700 rounded transition-colors">
+                {VERSION_LABELS[version]}
+                <ChevronDown className="h-3 w-3" />
+              </button>
+              {versionOpen && (
+                <div className="absolute top-full left-0 mt-1 w-40 bg-neutral-900 border border-neutral-700 rounded shadow-xl z-50">
+                  {(Object.keys(VERSION_LABELS) as SiteVersion[]).map((v) => (
+                    <button
+                      key={v}
+                      onClick={() => { setVersion(v); setVersionOpen(false); }}
+                      className={cn(
+                        "block w-full text-left px-3 py-2 text-xs transition-colors",
+                        version === v
+                          ? "text-accent bg-neutral-800"
+                          : "text-white hover:text-accent hover:bg-neutral-800"
+                      )}
+                    >
+                      {VERSION_LABELS[v]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           
           <div className="hidden md:flex ml-auto">
